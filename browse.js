@@ -64,12 +64,14 @@ function ProcessRequest(objectId, callback)
 module.exports = function(app) {
     app.get("/browse/:id", (req, res, next) => {
      ProcessRequest(req.params['id'], function(data){
+        res.set('Access-Control-Allow-Origin', '*');
         res.json(data);
      });
     });
     
     app.get("/browse", (req, res, next) => {
      ProcessRequest('0', function(data){
+        res.set('Access-Control-Allow-Origin', '*');
         res.json(data);
      });
     });
@@ -81,6 +83,7 @@ module.exports = function(app) {
      
      ProcessRequest(parentId, function(data){
         
+        res.set('Access-Control-Allow-Origin', '*');
         if(data['item'])
         {
             for(var index = 0; index < data['item'].length; index++)
