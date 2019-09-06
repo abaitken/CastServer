@@ -48,22 +48,10 @@ function ProcessRequest(objectId, callback)
             jsonData = parseResult['DIDL-Lite'];
         });
         
-        //console.log(jsonData);
-        var containers = new Array();
-        var items = new Array();
-        
-        if(jsonData['container'])
-            jsonData['container'].forEach(function(item) {
-               containers.push(item); 
-            });
-        if(jsonData['item'])
-            jsonData['item'].forEach(function(item) {
-               items.push(item); 
-            });
         
         var result = {
-            'container': containers,
-            'item': items
+            'container': jsonData['container'],
+            'item': jsonData['item']
         };
         
         callback(result);
@@ -74,8 +62,8 @@ function ProcessRequest(objectId, callback)
 
 
 module.exports = function(app) {
-    app.get("/browse/:path", (req, res, next) => {
-     ProcessRequest(req.params['path'], function(data){
+    app.get("/browse/:id", (req, res, next) => {
+     ProcessRequest(req.params['id'], function(data){
         res.json(data);
      });
     });
@@ -83,6 +71,43 @@ module.exports = function(app) {
     app.get("/browse", (req, res, next) => {
      ProcessRequest('0', function(data){
         res.json(data);
+     });
+    });
+    
+    app.get("/info/:id", (req, res, next) => {
+     
+     var lastPosition = req.params['id'].lastIndexOf('$');
+     var parentId = req.params['id'].substr(0, lastPosition);
+     
+     ProcessRequest(parentId, function(data){
+        
+        if(data['item'])
+        {
+            for(var index = 0; index < data['item'].length; index++)
+            {
+                var item = data['item'][index];
+                
+                if(item['$']['id'] == req.params['id'])
+                {
+                    res.json(item);
+                    return;
+                }
+            }
+        }
+        if(data['container'])
+        {
+            for(var index = 0; index < data['container'].length; index++)
+            {
+                var item = data['container'][index];
+                if(item['$']['id'] == req.params['id'])
+                {
+                    res.json(item);
+                    return;
+                }
+            }
+        }
+        
+        res.json({});
      });
     });
 };
