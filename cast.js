@@ -13,12 +13,6 @@ var client = new Client();
  
     // establish virtual connection to the receiver
     connection.send({ type: 'CONNECT' });
- 
-    // start heartbeating
-    // setInterval(function() {
-      // heartbeat.send({ type: 'PING' });
-    // }, 5000);
- 
     
     receiver.send({ type: 'GET_STATUS', requestId: 1 });
  
