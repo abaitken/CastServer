@@ -39,9 +39,30 @@ function GetChromecastStatus(callback) {
 }
 
 module.exports = function(app) {
-  app.get("/status", (req, res, next) => {
+  app.get("/cast/status", (req, res, next) => {
     GetChromecastStatus(function(data) {
       res.json(data);
     });
   });
+
+  app.get("/cast/pause", (req, res, next) => {
+    res.json({"result": "NotImplemented"});
+  });
+
+  app.get("/cast/play", (req, res, next) => {
+    res.json({"result": "NotImplemented"});
+  });
+
+  app.get("/cast/stop", (req, res, next) => {
+    res.json({"result": "NotImplemented"});
+  });
+
+  app.get("/cast/disconnect", (req, res, next) => {
+    res.json({"result": "NotImplemented"});
+  });
+
+  app.get("/cast/connect", (req, res, next) => {
+    res.json({"result": "NotImplemented"});
+  });
+    
 };
