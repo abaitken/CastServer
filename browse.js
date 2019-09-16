@@ -76,11 +76,11 @@ module.exports = function(app) {
   });
 
   app.get("/info/:id", (req, res, next) => {
+    res.set("Access-Control-Allow-Origin", "*");
     var lastPosition = req.params["id"].lastIndexOf("$");
     var parentId = req.params["id"].substr(0, lastPosition);
 
     ProcessRequest(parentId, function(data) {
-      res.set("Access-Control-Allow-Origin", "*");
       if (data["item"]) {
         for (var index = 0; index < data["item"].length; index++) {
           var item = data["item"][index];

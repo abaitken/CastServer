@@ -40,28 +40,34 @@ function GetChromecastStatus(callback) {
 
 module.exports = function(app) {
   app.get("/cast/status", (req, res, next) => {
+    res.set("Access-Control-Allow-Origin", "*");
     GetChromecastStatus(function(data) {
       res.json(data);
     });
   });
 
   app.get("/cast/pause", (req, res, next) => {
+    res.set("Access-Control-Allow-Origin", "*");
     res.json({"result": "NotImplemented"});
   });
 
   app.get("/cast/play", (req, res, next) => {
+    res.set("Access-Control-Allow-Origin", "*");
     res.json({"result": "NotImplemented"});
   });
 
   app.get("/cast/stop", (req, res, next) => {
+    res.set("Access-Control-Allow-Origin", "*");
     res.json({"result": "NotImplemented"});
   });
 
   app.get("/cast/disconnect", (req, res, next) => {
+    res.set("Access-Control-Allow-Origin", "*");
     res.json({"result": "NotImplemented"});
   });
 
   app.get("/cast/connect", (req, res, next) => {
+    res.set("Access-Control-Allow-Origin", "*");
     res.json({"result": "NotImplemented"});
   });
     
