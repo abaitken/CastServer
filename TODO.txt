@@ -1,0 +1,2 @@
+Consider adding cross origin header conditionally 
+    res.set("Access-Control-Allow-Origin", "*");

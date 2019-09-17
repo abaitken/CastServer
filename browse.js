@@ -63,20 +63,17 @@ function ProcessRequest(objectId, callback) {
 module.exports = function(app) {
   app.get("/browse/:id", (req, res, next) => {
     ProcessRequest(req.params["id"], function(data) {
-      res.set("Access-Control-Allow-Origin", "*");
       res.json(data);
     });
   });
 
   app.get("/browse", (req, res, next) => {
     ProcessRequest("0", function(data) {
-      res.set("Access-Control-Allow-Origin", "*");
       res.json(data);
     });
   });
 
   app.get("/info/:id", (req, res, next) => {
-    res.set("Access-Control-Allow-Origin", "*");
     var lastPosition = req.params["id"].lastIndexOf("$");
     var parentId = req.params["id"].substr(0, lastPosition);
 
