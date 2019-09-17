@@ -1,4 +1,3 @@
-var serviceUrl = 'http://localhost:3000';
 
 function ViewModel() {
   var self = this;
@@ -15,7 +14,7 @@ function ViewModel() {
 
       var id = r[0];
 
-      var url = serviceUrl + "/info/" + id;
+      var url = "/info/" + id;
 
       $.ajax({
         type: "GET",
@@ -40,7 +39,7 @@ function ViewModel() {
         data: function(node, cb) {
           if (node.id === "err") return;
 
-          var url = serviceUrl + "/browse";
+          var url = "/browse";
           if (node.id !== "#") url = url + "/" + node.id;
 
           $.ajax({
@@ -111,7 +110,7 @@ function ViewModel() {
 		
 		$.ajax({
 			type: "GET",
-			url: serviceUrl + '/playlist/list',
+			url: '/playlist/list',
 			dataType: "json",
 			mimeType: "application/json",
 			success: function(data) {
