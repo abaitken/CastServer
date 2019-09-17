@@ -1,3 +1,8 @@
+import $ from 'jquery';
+import ko from 'knockout';
+import 'bootstrap';
+import 'jstree';
+import 'popper.js';
 
 function ViewModel() {
   var self = this;
