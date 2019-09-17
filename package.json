@@ -1,0 +1,27 @@
+{
+  "name": "castserver",
+  "version": "1.0.0",
+  "description": "A work in progress",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abaitken/CastServer.git"
+  },
+  "author": "Alex Boyne-Aitken",
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "bugs": {
+    "url": "https://github.com/abaitken/CastServer/issues"
+  },
+  "homepage": "https://github.com/abaitken/CastServer#readme",
+  "dependencies": {
+    "castv2": "^0.1.10",
+    "express": "^4.17.1",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.7",
+    "unescape": "^1.0.1",
+    "xml2js": "^0.4.22"
+  }
+}
