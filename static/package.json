@@ -1,0 +1,20 @@
+{
+  "name": "media-controls",
+  "version": "1.0.0",
+  "description": "Javascript page to control casting server",
+  "private": true,
+  "main": "js/viewmodel.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abaitken/CastServer/tree/master/static"
+  },
+  "author": "Alex Boyne-Aitken",
+  "license": "SEE LICENSE IN ../LICENSE.txt",
+  "dependencies": {
+    "bootstrap": "^4.3.1",
+    "jquery": "^3.4.1",
+    "jstree": "^3.3.8",
+    "knockout": "^3.5.0",
+    "popper.js": "^1.15.0"
+  }
+}

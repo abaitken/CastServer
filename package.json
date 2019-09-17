@@ -1,7 +1,8 @@
 {
   "name": "castserver",
   "version": "1.0.0",
-  "description": "A work in progress",
+  "description": "A server that casts to a Chromecast controlled from a javascript page",
+  "private": true,
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
