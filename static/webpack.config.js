@@ -1,6 +1,7 @@
 
 module.exports = {
   entry: './js/viewmodel.js',
+  mode: 'development',
   output: {
     filename: 'bundle.js',
     path: __dirname
