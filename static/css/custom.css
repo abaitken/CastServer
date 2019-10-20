@@ -2,3 +2,14 @@ body {
   padding-top: 5rem;
   background: #e5e5e5;
 }
+
+/*TODO*/
+/* $breadcrumb-divider: quote(">"); */
+/* .breadcrumb>li+li:before { padding: 0 5px; color: #ccc; content: ">"; } */
+
+.folderItems :nth-child(even){
+  background-color: #eeeeee;
+}
+.folderItems :nth-child(odd){
+  background-color: #cccccc;
+}

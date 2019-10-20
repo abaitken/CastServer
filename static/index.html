@@ -1,44 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Media Controls</title>
-    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="css/custom.css" />
-    <link rel="stylesheet" href="css/themes/default/style.min.css" />
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-      <a class="navbar-brand" href="#">Media Controls</a>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Media Controls</title>
+  <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/themes/default/style.min.css" />
+  <link rel="stylesheet" href="css/custom.css" />
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="#">Media Controls</a>
+  </nav>
+
+  <main role="main" class="container">
+    <!-- ko ifnot: dataReady -->
+    <div data-bind="text: messages" class="alert alert-info" role="alert" id="messages">
+      Fetching...
+    </div>
+    <!-- /ko -->
+
+    <div data-bind="foreach: playlist">
+      <p data-bind="text: value"></p>
+    </div>
+
+    <!-- ko if: dataReady -->
+    <!-- /ko -->
+    <div id="track-info"></div>
+
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#">TODO</a></li>
+        <li class="breadcrumb-item"><a href="#">Working</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Breadcrumb</li>
+      </ol>
     </nav>
 
-    <main role="main" class="container">
-      <!-- ko ifnot: dataReady -->
-      <div
-        data-bind="text: messages"
-        class="alert alert-info"
-        role="alert"
-        id="messages"
-      >
-        Fetching...
-      </div>
+    <div data-bind="foreach: folderData" class="list-group folderItems">
+      <!-- ko foreach: container -->
+      <a href="#" data-bind="text: title, id: id" class="list-group-item list-group-item-action"></a>
       <!-- /ko -->
-
-      <div data-bind="foreach: playlist">
-          <p data-bind="text: value"></p>
-      </div>
-
-      <!-- ko if: dataReady -->
+      <!-- ko foreach: item -->
+      <a href="#" data-bind="text: title" class="list-group-item list-group-item-action"></a>
       <!-- /ko -->
-      <div id="track-info"></div>
-      <div id="treeview"></div>
-    </main>
+    </div>
+  </main>
 
-    <script src="bundle.js" type="text/javascript"></script>
-  </body>
+  <script src="bundle.js" type="text/javascript"></script>
+</body>
+
 </html>
