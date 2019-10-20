@@ -8,20 +8,21 @@ function ViewModel() {
   self.dataReady = ko.observable(false);
   self.messages = ko.observable("Fetching...");
   self.folderData = ko.observable();
-  self.playlist = [];
+  self.playlist = ko.observableArray();
   self.breadcrumb = ko.observableArray();
+  self.focusItem = ko.observable(false);
 
-  self.breadcrumbJump = function(item){
-
-    for(var i = self.breadcrumb().length - 1; i > 0; i--)
-    {
-      if(self.breadcrumb()[i]['id'] != item['id'])
-        self.breadcrumb.pop();
+  self.breadcrumbJump = function (item) {
+    for (var i = self.breadcrumb().length - 1; i > 0; i--) {
+      if (self.breadcrumb()[i]['id'] == item['id'])
+        break;
+      self.breadcrumb.pop();      
     }
     self.switchFolderView(item['id']);
   };
-  
+
   self.switchFolderView = function (id) {
+    self.focusItem(false);
     var url = "/browse";
     if (id !== "#") url = url + "/" + id;
     $.ajax({
@@ -41,11 +42,13 @@ function ViewModel() {
     });
   };
 
+  self.folderClicked = function (item) {
+    self.breadcrumb.push(item);
+    self.switchFolderView(item['id']);
+  };
+
   self.itemClicked = function (item) {
-    if (item['class'].indexOf('Folder') !== -1) {
-      self.breadcrumb.push(item);
-      self.switchFolderView(item['id']);
-    }
+    self.focusItem(item);
   };
 
   self.Init = function () {
@@ -57,21 +60,21 @@ function ViewModel() {
     self.switchFolderView('#');
 
 
-    // $.ajax({
-    // 	type: "GET",
-    // 	url: '/playlist/list',
-    // 	dataType: "json",
-    // 	mimeType: "application/json",
-    // 	success: function(data) {
-    // 		self.playlist = data;
-    // 	},
-    // 	error: function(jqXHR, textStatus, errorThrown) {
-    // 		self.messages(errorThrown);
-    // 		$("#messages").attr("class", "alert alert-danger");
-    // 		// TODO : Text not displaying correctly
-    // 		$("#track-info").html("Error: " + errorThrown);
-    // 	}
-    // });
+    $.ajax({
+    	type: "GET",
+    	url: '/playlist/list',
+    	dataType: "json",
+    	mimeType: "application/json",
+    	success: function(data) {
+    		self.playlist(data);
+    	},
+    	error: function(jqXHR, textStatus, errorThrown) {
+    		self.messages(errorThrown);
+    		$("#messages").attr("class", "alert alert-danger");
+    		// TODO : Text not displaying correctly
+    		$("#track-info").html("Error: " + errorThrown);
+    	}
+    });
 
     self.dataReady(true);
   };
