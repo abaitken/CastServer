@@ -32,16 +32,20 @@
     <div id="track-info"></div>
 
     <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="#">TODO</a></li>
-        <li class="breadcrumb-item"><a href="#">Working</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Breadcrumb</li>
+      <ol class="breadcrumb" data-bind="foreach: breadcrumb">
+        <!-- ko if: ($index() !== ($parent.breadcrumb().length - 1)) -->
+        <li class="breadcrumb-item"><a href="#" data-bind="text: title, click: $root.breadcrumbJump"></a></li>
+        <!-- /ko -->
+
+        <!-- ko if: ($index() === ($parent.breadcrumb().length - 1)) -->
+        <li class="breadcrumb-item active" aria-current="page" data-bind="text: title"></li>
+        <!-- /ko -->        
       </ol>
     </nav>
 
     <div data-bind="foreach: folderData" class="list-group folderItems">
       <!-- ko foreach: container -->
-      <a href="#" data-bind="text: title, id: id" class="list-group-item list-group-item-action"></a>
+      <a href="#" data-bind="text: title, id: id, click: $root.itemClicked" class="list-group-item list-group-item-action"></a>
       <!-- /ko -->
       <!-- ko foreach: item -->
       <a href="#" data-bind="text: title" class="list-group-item list-group-item-action"></a>

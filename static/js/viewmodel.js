@@ -6,147 +6,72 @@ import 'popper.js';
 function ViewModel() {
   var self = this;
   self.dataReady = ko.observable(false);
-	self.messages = ko.observable("Fetching...");
+  self.messages = ko.observable("Fetching...");
   self.folderData = ko.observable();
-	self.playlist = [];
+  self.playlist = [];
+  self.breadcrumb = ko.observableArray();
 
-	self._initMediaView = function() {
-		// $("#treeview").on("changed.jstree", function(e, data) {
-    //   var r = [];
-    //   for (var i = 0, j = data.selected.length; i < j; i++) {
-    //     r.push(data.instance.get_node(data.selected[i]).id);
-    //   }
+  self.breadcrumbJump = function(item){
 
-    //   var id = r[0];
-
-    //   var url = "/info/" + id;
-
-    //   $.ajax({
-    //     type: "GET",
-    //     url: url,
-    //     dataType: "json",
-    //     mimeType: "application/json",
-    //     success: function(data) {
-    //       $("#track-info").text(data["res"]);
-    //     },
-    //     error: function(jqXHR, textStatus, errorThrown) {
-    //       self.messages(errorThrown);
-    //       $("#messages").attr("class", "alert alert-danger");
-    //       // TODO : Text not displaying correctly
-    //       $("#track-info").html("Error: " + errorThrown);
-    //     }
-    //   });
-		// });
-
-    
+    for(var i = self.breadcrumb().length - 1; i > 0; i--)
+    {
+      if(self.breadcrumb()[i]['id'] != item['id'])
+        self.breadcrumb.pop();
+    }
+    self.switchFolderView(item['id']);
+  };
+  
+  self.switchFolderView = function (id) {
     var url = "/browse";
-    //if (node.id !== "#") url = url + "/" + node.id;
+    if (id !== "#") url = url + "/" + id;
     $.ajax({
       type: "GET",
       url: url,
       dataType: "json",
       mimeType: "application/json",
-      success: function(data) {
+      success: function (data) {
         self.folderData(data);
       },
-      error: function(jqXHR, textStatus, errorThrown) {
+      error: function (jqXHR, textStatus, errorThrown) {
         self.messages(errorThrown);
         $("#messages").attr("class", "alert alert-danger");
         // TODO : Text not displaying correctly
         $("#track-info").html("Error: " + errorThrown);
       }
     });
+  };
 
-    // $("#treeview").jstree({
-    //   core: {
-    //     data: function(node, cb) {
-    //       if (node.id === "err") return;
+  self.itemClicked = function (item) {
+    if (item['class'].indexOf('Folder') !== -1) {
+      self.breadcrumb.push(item);
+      self.switchFolderView(item['id']);
+    }
+  };
 
-    //       var url = "/browse";
-    //       if (node.id !== "#") url = url + "/" + node.id;
-
-    //       $.ajax({
-    //         type: "GET",
-    //         url: url,
-    //         dataType: "json",
-    //         mimeType: "application/json",
-    //         success: function(data) {
-    //           var nodes = [];
-
-    //           if (data["container"])
-    //             if (Array.isArray(data.container))
-    //               data.container.forEach(function(item, index, array) {
-    //                 nodes.push({
-    //                   text: item["dc:title"],
-    //                   id: item["$"]["id"],
-    //                   children: item["$"]["childCount"] !== "0"
-    //                 });
-    //               });
-    //             else {
-    //               var item = data.container;
-    //               nodes.push({
-    //                 text: item["dc:title"],
-    //                 id: item["$"]["id"],
-    //                 children: item["$"]["childCount"] !== "0"
-    //               });
-    //             }
-
-    //           if (data["item"])
-    //             if (Array.isArray(data.item))
-    //               data.item.forEach(function(item, index, array) {
-    //                 nodes.push({
-    //                   text: item["dc:title"],
-    //                   id: item["$"]["id"],
-    //                   children: false,
-    //                   icon: "jstree-file"
-    //                 });
-    //               });
-    //             else {
-    //               var item = data.item;
-    //               nodes.push({
-    //                 text: item["dc:title"],
-    //                 id: item["$"]["id"],
-    //                 children: false,
-    //                 icon: "jstree-file"
-    //               });
-    //             }
-
-    //           cb(nodes);
-    //         },
-    //         error: function(jqXHR, textStatus, errorThrown) {
-    //           self.messages(errorThrown);
-    //           $("#messages").attr("class", "alert alert-danger");
-    //           // TODO : Text not displaying correctly
-    //           cb([
-    //             { text: "Error: " + errorThrown, id: "err", children: false }
-    //           ]);
-    //         }
-    //       });
-    //     }
-    //   }
-    // });
-	};
-
-	self.Init = function() {
+  self.Init = function () {
     ko.applyBindings(self);
-		self._initMediaView();
-    
-    
-		// $.ajax({
-		// 	type: "GET",
-		// 	url: '/playlist/list',
-		// 	dataType: "json",
-		// 	mimeType: "application/json",
-		// 	success: function(data) {
-		// 		self.playlist = data;
-		// 	},
-		// 	error: function(jqXHR, textStatus, errorThrown) {
-		// 		self.messages(errorThrown);
-		// 		$("#messages").attr("class", "alert alert-danger");
-		// 		// TODO : Text not displaying correctly
-		// 		$("#track-info").html("Error: " + errorThrown);
-		// 	}
-		// });
+    self.breadcrumb.push({
+      title: 'Root',
+      id: '#'
+    })
+    self.switchFolderView('#');
+
+
+    // $.ajax({
+    // 	type: "GET",
+    // 	url: '/playlist/list',
+    // 	dataType: "json",
+    // 	mimeType: "application/json",
+    // 	success: function(data) {
+    // 		self.playlist = data;
+    // 	},
+    // 	error: function(jqXHR, textStatus, errorThrown) {
+    // 		self.messages(errorThrown);
+    // 		$("#messages").attr("class", "alert alert-danger");
+    // 		// TODO : Text not displaying correctly
+    // 		$("#track-info").html("Error: " + errorThrown);
+    // 	}
+    // });
 
     self.dataReady(true);
   };
