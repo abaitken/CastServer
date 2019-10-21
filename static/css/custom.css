@@ -7,9 +7,21 @@ body {
 /* $breadcrumb-divider: quote(">"); */
 /* .breadcrumb>li+li:before { padding: 0 5px; color: #ccc; content: ">"; } */
 
-.folderItems :nth-child(even){
+/* .folderItems :nth-child(even){
   background-color: #eeeeee;
 }
 .folderItems :nth-child(odd){
   background-color: #cccccc;
+} */
+
+.clickItem {
+  cursor: pointer;
+}
+
+.itemCell {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  background-color: #f8f9fa;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid #aaaaaa;
 }

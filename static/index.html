@@ -33,14 +33,20 @@
           </ol>
         </nav>
 
-        <div data-bind="foreach: folderData" class="list-group folderItems">
+        <div data-bind="foreach: folderData" class="container">
           <!-- ko foreach: container -->
-          <a href="#" data-bind="text: title, click: $root.folderClicked"
-            class="list-group-item list-group-item-action"></a>
+          <div class="row">
+            <div class="col-1 itemCell">FOLDER</div>
+            <div class="col clickItem itemCell" data-bind="click: $root.folderClicked"><span data-bind="text: title"></span></div>
+            <div class="col-1"><button type="button" data-bind="click: $root.addEntityToPlaylist" class="btn btn-primary float-right">+</button></div>
+          </div>
           <!-- /ko -->
           <!-- ko foreach: item -->
-          <a href="#" data-bind="text: title, click: $root.itemClicked"
-            class="list-group-item list-group-item-action"></a>
+          <div class="row">
+              <div class="col-1 itemCell">ITEM</div>
+              <div class="col clickItem itemCell" data-bind="click: $root.itemClicked"><span data-bind="text: title"></span></div>
+              <div class="col-1"><button type="button" data-bind="click: $root.addEntityToPlaylist" class="btn btn-primary float-right">+</button></div>
+            </div>
           <!-- /ko -->
         </div>
       </main>
@@ -53,7 +59,7 @@
             <p data-bind="text: title"></p>
           </div>
           <!-- /ko -->
-          
+
           <h4>PLAYLIST</h4>
           <div data-bind="foreach: playlist">
             <p data-bind="text: title"></p>

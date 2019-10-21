@@ -12,6 +12,9 @@ function ViewModel() {
   self.breadcrumb = ko.observableArray();
   self.focusItem = ko.observable(false);
 
+  self.addEntityToPlaylist = function(item){
+    self.playlist.push(item);
+  };
   self.breadcrumbJump = function (item) {
     for (var i = self.breadcrumb().length - 1; i > 0; i--) {
       if (self.breadcrumb()[i]['id'] == item['id'])
