@@ -1,6 +1,6 @@
 var g_playlist = [];
 
-module.exports = function(app) {
+module.exports = function(app, config) {
   app.get("/playlist/list", (req, res, next) => {
     res.json(g_playlist);
   });

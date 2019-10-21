@@ -51,7 +51,7 @@ function RestructureEntities(o, redfineCallback) {
   return result;
 }
 
-function FetchDNLAData(objectId, callback) {
+function FetchDNLAData(config, objectId, callback) {
   var request = require("request-promise-native");
 
   var requestBody =
@@ -79,11 +79,11 @@ function FetchDNLAData(objectId, callback) {
 
   var requestOptions = {
     method: "POST",
-    url: "http://dnla.services.lan/ctl/ContentDir",
+    url: config.dlna.protocol + "://" + config.dlna.domain + "/ctl/ContentDir",
     qs: { wsdl: "" },
     headers: requestHeaders,
     body: requestBody,
-    timeout: 5000
+    timeout: config.dlna.timeout
   };
 
   request(requestOptions)
@@ -123,10 +123,10 @@ function ProcessDNLAData(data)
   return result;
 }
 
-module.exports = function (app) {
+module.exports = function (app, config) {
 
   app.get("/raw/:id", (req, res, next) => {
-    FetchDNLAData(req.params["id"], function (data, error) {
+    FetchDNLAData(config, req.params["id"], function (data, error) {
       if(error)// TODO : Is this correct, doesnt seem to work
       {
         res.json(CreateErrorResult(error));
@@ -137,7 +137,7 @@ module.exports = function (app) {
   });
 
   app.get("/raw", (req, res, next) => {
-    FetchDNLAData("0", function (data, error) {
+    FetchDNLAData(config, "0", function (data, error) {
       if(error)// TODO : Is this correct, doesnt seem to work
       {
         res.json(CreateErrorResult(error));
@@ -149,7 +149,7 @@ module.exports = function (app) {
 
 
   app.get("/browse/:id", (req, res, next) => {
-    FetchDNLAData(req.params["id"], function (data, error) {
+    FetchDNLAData(config, req.params["id"], function (data, error) {
       if(error)// TODO : Is this correct, doesnt seem to work
       {
         res.json(CreateErrorResult(error));
@@ -160,7 +160,7 @@ module.exports = function (app) {
   });
 
   app.get("/browse", (req, res, next) => {
-    FetchDNLAData("0", function (data, error) {
+    FetchDNLAData(config, "0", function (data, error) {
       if(error)// TODO : Is this correct, doesnt seem to work
       {
         res.json(CreateErrorResult(error));
@@ -174,7 +174,7 @@ module.exports = function (app) {
     var lastPosition = req.params["id"].lastIndexOf("$");
     var parentId = req.params["id"].substr(0, lastPosition);
 
-    FetchDNLAData(parentId, function (dnlaData, error) {
+    FetchDNLAData(config, parentId, function (dnlaData, error) {
       
       if(error)// TODO : Is this correct, doesnt seem to work
       {

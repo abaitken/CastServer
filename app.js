@@ -1,9 +1,11 @@
+var config = require('./config.json');
+
 var express = require("express");
 var app = express();
 
-require("./browse")(app);
-require("./cast")(app);
-require("./playlist")(app);
+require("./browse")(app, config);
+require("./cast")(app, config);
+require("./playlist")(app, config);
 
 app.use(express.static('static'));
 

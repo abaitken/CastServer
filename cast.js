@@ -1,6 +1,5 @@
-function GetChromecastStatus(callback) {
+function GetChromecastStatus(host, callback) {
   var Client = require("castv2").Client;
-  var host = "192.168.1.4";
 
   var client = new Client();
   client.connect(host, function() {
@@ -11,12 +10,12 @@ function GetChromecastStatus(callback) {
       "urn:x-cast:com.google.cast.tp.connection",
       "JSON"
     );
-    var heartbeat = client.createChannel(
-      "sender-0",
-      "receiver-0",
-      "urn:x-cast:com.google.cast.tp.heartbeat",
-      "JSON"
-    );
+    // var heartbeat = client.createChannel(
+    //   "sender-0",
+    //   "receiver-0",
+    //   "urn:x-cast:com.google.cast.tp.heartbeat",
+    //   "JSON"
+    // );
     var receiver = client.createChannel(
       "sender-0",
       "receiver-0",
@@ -38,9 +37,11 @@ function GetChromecastStatus(callback) {
   });
 }
 
-module.exports = function(app) {
+module.exports = function(app, config) {
   app.get("/cast/status", (req, res, next) => {
-    GetChromecastStatus(function(data) {
+    // TODO : Resolve this hard coded device!
+    var host = config.devices[0]['address'];
+    GetChromecastStatus(host, function(data) {
       res.json(data);
     });
   });
