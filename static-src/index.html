@@ -33,36 +33,41 @@
         <div data-bind="foreach: folderData" class="container">
           <!-- ko foreach: container -->
           <div class="row">
-            <div class="col-1 itemCell clickItem">
-              <span class="fas fa-folder" data-bind="click: $root.folderClicked"></span>
-            </div>
-            <div class="col clickItem itemCell" data-bind="click: $root.folderClicked"><span
-                data-bind="text: title"></span></div>
-            <div class="col-1">
-              <!-- fa-plus-square -->
-              <button type="button" class="btn btn-default" data-bind="click: $root.addEntityToPlaylist">
-                <i class="fas fa-stream"></i>
-              </button>
-              <button type="button" class="btn btn-default" data-bind="click: $root.addEntityToPlaylist">
-                <i class="fas fa-play"></i>
-              </button>
+            <div class="col clickItem itemCell" data-bind="click: $root.folderClicked, clickBubble: false">
+              <span>
+                <span class="fas fa-folder"></span>
+                <span data-bind="text: title"></span>
+              </span>
+              <span class="float-right">
+                <button type="button" class="btn btn-default"
+                  data-bind="click: $root.addEntityToPlaylist, clickBubble: false">
+                  <i class="fas fa-stream"></i>
+                </button>
+                <button type="button" class="btn btn-default"
+                  data-bind="click: $root.addEntityToPlaylist, clickBubble: false">
+                  <i class="fas fa-play"></i>
+                </button>
+              </span>
             </div>
           </div>
           <!-- /ko -->
           <!-- ko foreach: item -->
           <div class="row">
-            <div class="col-1 itemCell">
-              <span class="glyphicon glyphicon-file" data-bind="click: $root.itemClicked"></span>
-            </div>
-            <div class="col clickItem itemCell" data-bind="click: $root.itemClicked"><span
-                data-bind="text: title"></span></div>
-            <div class="col-1">
-              <button type="button" class="btn btn-default">
-                <i class="fas fa-stream" data-bind="click: $root.addEntityToPlaylist"></i>
-              </button>
-              <button type="button" class="btn btn-default">
-                <i class="fas fa-play" data-bind="click: $root.addEntityToPlaylist"></i>
-              </button>
+            <div class="col clickItem itemCell" data-bind="click: $root.itemClicked, clickBubble: false">
+              <span>
+                <span class="fas fa-music"></span>
+                <span data-bind="text: title"></span>
+              </span>
+              <span class="float-right">
+                <button type="button" class="btn btn-default"
+                  data-bind="click: $root.addEntityToPlaylist, clickBubble: false">
+                  <i class="fas fa-stream"></i>
+                </button>
+                <button type="button" class="btn btn-default"
+                  data-bind="click: $root.addEntityToPlaylist, clickBubble: false">
+                  <i class="fas fa-play"></i>
+                </button>
+              </span>
             </div>
           </div>
           <!-- /ko -->
