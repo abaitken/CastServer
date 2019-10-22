@@ -5,9 +5,7 @@ import 'popper.js';
 import '@fortawesome/fontawesome-free/js/all.js'
 import '@fortawesome/fontawesome-free/css/all.css'
 require('file-loader?name=[name].[ext]!./index.html');
-
-import './node_modules/bootstrap/dist/css/bootstrap.min.css';
-import './custom.css';
+import './custom.scss';
 
 function ViewModel() {
   var self = this;
