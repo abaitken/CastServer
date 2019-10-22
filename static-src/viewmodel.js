@@ -21,19 +21,24 @@ function ViewModel() {
   self.addEntityToPlaylist = function(item){
     self.playlist.push(item);
   };
-  self.breadcrumbJump = function (item) {
+
+  self._breadcrumbJumpImpl = function (id) {
     for (var i = self.breadcrumb().length - 1; i > 0; i--) {
-      if (self.breadcrumb()[i]['id'] == item['id'])
+      if (self.breadcrumb()[i]['id'] == id)
         break;
-      self.breadcrumb.pop();      
+      self.breadcrumb.pop();
     }
-    self.switchFolderView(item['id']);
+    self.switchFolderView(id);
+  };
+
+  self.breadcrumbJump = function (item) {
+    self._breadcrumbJumpImpl(item['id']);
   };
 
   self.switchFolderView = function (id) {
     self.focusItem(false);
-    var url = "/browse";
-    if (id !== "#") url = url + "/" + id;
+    window.location.href = "#" + id;
+    var url = "/browse/" + id;
     $.ajax({
       type: "GET",
       url: url,
@@ -64,9 +69,9 @@ function ViewModel() {
     ko.applyBindings(self);
     self.breadcrumb.push({
       title: 'Root',
-      id: '#'
+      id: '0'
     })
-    self.switchFolderView('#');
+    self.switchFolderView('0');
 
 
     $.ajax({
