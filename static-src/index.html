@@ -33,17 +33,18 @@
         <div data-bind="foreach: folderData" class="container">
           <!-- ko foreach: container -->
           <div class="row">
-            <div class="col-1 itemCell">
-              <span class="glyphicon glyphicon-folder-open" data-bind="click: $root.folderClicked"></span>
+            <div class="col-1 itemCell clickItem">
+              <span class="fas fa-folder" data-bind="click: $root.folderClicked"></span>
             </div>
             <div class="col clickItem itemCell" data-bind="click: $root.folderClicked"><span
                 data-bind="text: title"></span></div>
             <div class="col-1">
-              <button type="button" class="btn btn-default">
-                <span class="glyphicon glyphicon-plus" data-bind="click: $root.addEntityToPlaylist"></span>
+              <!-- fa-plus-square -->
+              <button type="button" class="btn btn-default" data-bind="click: $root.addEntityToPlaylist">
+                <i class="fas fa-stream"></i>
               </button>
-              <button type="button" class="btn btn-default">
-                <span class="glyphicon glyphicon-play" data-bind="click: $root.addEntityToPlaylist"></span>
+              <button type="button" class="btn btn-default" data-bind="click: $root.addEntityToPlaylist">
+                <i class="fas fa-play"></i>
               </button>
             </div>
           </div>
@@ -57,10 +58,10 @@
                 data-bind="text: title"></span></div>
             <div class="col-1">
               <button type="button" class="btn btn-default">
-                <span class="glyphicon glyphicon-plus" data-bind="click: $root.addEntityToPlaylist"></span>
+                <i class="fas fa-stream" data-bind="click: $root.addEntityToPlaylist"></i>
               </button>
               <button type="button" class="btn btn-default">
-                <span class="glyphicon glyphicon-play" data-bind="click: $root.addEntityToPlaylist"></span>
+                <i class="fas fa-play" data-bind="click: $root.addEntityToPlaylist"></i>
               </button>
             </div>
           </div>

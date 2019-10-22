@@ -1,4 +1,2 @@
-/*.png
-/*.js
-/*.html
-/*.gif
+*
+!.gitignore

@@ -6,6 +6,8 @@ import './node_modules/bootstrap/dist/css/bootstrap.min.css';
 import './css/themes/default/style.min.css';
 import './css/custom.css';
 require('file-loader?name=[name].[ext]!./index.html');
+import '@fortawesome/fontawesome-free/js/all.js'
+import '@fortawesome/fontawesome-free/css/all.css'
 
 function ViewModel() {
   var self = this;
