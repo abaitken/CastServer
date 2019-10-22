@@ -1,10 +1,11 @@
+const path = require('path');
 
 module.exports = {
   entry: './js/viewmodel.js',
   mode: 'development',
   output: {
     filename: 'bundle.js',
-    path: __dirname
+    path: path.resolve(__dirname, '../static')
   },
   module: {
     rules: [
