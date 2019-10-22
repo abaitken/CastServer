@@ -6,9 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>Media Controls</title>
-  <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="css/themes/default/style.min.css" />
-  <link rel="stylesheet" href="css/custom.css" />
 </head>
 
 <body>
@@ -20,7 +17,7 @@
 
     <div class="row">
 
-      <main class="col-md-9 ml-sm-auto col-lg-10 px-4" role="main">
+      <div class="col-md-9 ml-sm-auto col-lg-10 px-4">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb" data-bind="foreach: breadcrumb">
             <!-- ko if: ($index() !== ($parent.breadcrumb().length - 1)) -->
@@ -36,22 +33,42 @@
         <div data-bind="foreach: folderData" class="container">
           <!-- ko foreach: container -->
           <div class="row">
-            <div class="col-1 itemCell">FOLDER</div>
-            <div class="col clickItem itemCell" data-bind="click: $root.folderClicked"><span data-bind="text: title"></span></div>
-            <div class="col-1"><button type="button" data-bind="click: $root.addEntityToPlaylist" class="btn btn-primary float-right">+</button></div>
+            <div class="col-1 itemCell">
+              <span class="glyphicon glyphicon-folder-open" data-bind="click: $root.folderClicked"></span>
+            </div>
+            <div class="col clickItem itemCell" data-bind="click: $root.folderClicked"><span
+                data-bind="text: title"></span></div>
+            <div class="col-1">
+              <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-plus" data-bind="click: $root.addEntityToPlaylist"></span>
+              </button>
+              <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-play" data-bind="click: $root.addEntityToPlaylist"></span>
+              </button>
+            </div>
           </div>
           <!-- /ko -->
           <!-- ko foreach: item -->
           <div class="row">
-              <div class="col-1 itemCell">ITEM</div>
-              <div class="col clickItem itemCell" data-bind="click: $root.itemClicked"><span data-bind="text: title"></span></div>
-              <div class="col-1"><button type="button" data-bind="click: $root.addEntityToPlaylist" class="btn btn-primary float-right">+</button></div>
+            <div class="col-1 itemCell">
+              <span class="glyphicon glyphicon-file" data-bind="click: $root.itemClicked"></span>
             </div>
+            <div class="col clickItem itemCell" data-bind="click: $root.itemClicked"><span
+                data-bind="text: title"></span></div>
+            <div class="col-1">
+              <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-plus" data-bind="click: $root.addEntityToPlaylist"></span>
+              </button>
+              <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-play" data-bind="click: $root.addEntityToPlaylist"></span>
+              </button>
+            </div>
+          </div>
           <!-- /ko -->
         </div>
-      </main>
+      </div>
 
-      <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+      <div class="col-md-2 d-none d-md-block bg-light sidebar">
         <div class="sidebar-stick">
           <!-- ko if: focusItem -->
           <h4>TRACK INFO</h4>
@@ -66,7 +83,7 @@
           </div>
 
         </div>
-      </nav>
+      </div>
     </div>
 
     <!-- ko ifnot: dataReady -->
