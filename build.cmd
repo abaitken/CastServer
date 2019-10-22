@@ -1,4 +1,4 @@
 @echo off
 pushd "%~dp0"
-call static\build.cmd
+call static-src\build.cmd
 popd

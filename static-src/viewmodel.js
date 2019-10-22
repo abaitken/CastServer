@@ -2,9 +2,10 @@ import $ from 'jquery';
 import ko from 'knockout';
 import 'bootstrap';
 import 'popper.js';
-import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
-import '../css/themes/default/style.min.css';
-import '../css/custom.css';
+import './node_modules/bootstrap/dist/css/bootstrap.min.css';
+import './css/themes/default/style.min.css';
+import './css/custom.css';
+require('file-loader?name=[name].[ext]!./index.html');
 
 function ViewModel() {
   var self = this;

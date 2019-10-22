@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: './js/viewmodel.js',
+  entry: './viewmodel.js',
   mode: 'development',
   output: {
     filename: 'bundle.js',
