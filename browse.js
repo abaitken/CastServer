@@ -110,6 +110,8 @@ function FetchDNLAData(config, objectId, callback) {
 
 function CreateErrorResult(error){
   return {
+    container: [],
+    item: [],
     error: "TODO : More error details"
   };
 }
