@@ -1,4 +1,4 @@
-function RestructureContainer(item) {
+function RedefineContainer(item) {
   
   return {
     id: item['$']['id'],
@@ -11,7 +11,7 @@ function RestructureContainer(item) {
   };
 }
 
-function RestructureItem(item){
+function RedefineMusic(item){
   return {
     id: item['$']['id'],
     parentID: item['$']['parentID'],
@@ -34,18 +34,40 @@ function RestructureItem(item){
   };
 }
 
-function RestructureEntities(o, redfineCallback) {
+function RedefineUnknown(item){
+  return {
+    id: item['$']['id'],
+    parentID: item['$']['parentID'],
+    title: item['dc:title'],
+    class: item['upnp:class'],
+  };
+};
+
+function RedefineItem(item){
+  var classType = item['upnp:class'];
+  if (classType.toLowerCase().indexOf('folder') !== -1) {
+    return RedefineContainer(item);
+  }
+
+  if (classType.toLowerCase().indexOf('track') !== -1) {
+    return RedefineMusic(item);
+  }
+
+  return RedefineUnknown(item);
+}
+
+function RestructureEntities(o) {
   var result = [];
 
   if (o) {
     if (Array.isArray(o)) {
       for (const key in o) {
         var item = o[key];
-        result.push(redfineCallback(item));
+        result.push(RedefineItem(item));
       }
     }
     else {
-      result.push(redfineCallback(o));
+      result.push(RedefineItem(o));
     }
   }
   return result;
@@ -117,8 +139,8 @@ function CreateErrorResult(error){
 
 function ProcessDNLAData(data)
 {  
-  var containers = RestructureEntities(data["container"], RestructureContainer);
-  var items = RestructureEntities(data["item"], RestructureItem);
+  var containers = RestructureEntities(data["container"]);
+  var items = RestructureEntities(data["item"]);
   var resultItems = containers.concat(items);
 
   var result = {    
