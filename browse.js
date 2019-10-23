@@ -151,13 +151,15 @@ function ProcessDNLAData(data)
 
 module.exports = function (app, config) {
 
-  // TODO : Consider conditionally including these only on DEV environments
-  app.get("/raw/:id", (req, res, next) => {
+  var ITEM_PAGE_COUNT = 25;
+
+  // TODO : Consider conditionally including this only on DEV environments
+  app.get("/raw/:id(/:page(\d+))?", (req, res, next) => {
     FetchDNLAData(config, 
       { 
         objectId: req.params["id"], 
-        startingIndex: 0, 
-        requestedCount: 0 
+        startingIndex: (req.params["page"] ? req.params["page"] : 0) * ITEM_PAGE_COUNT, 
+        requestedCount: ITEM_PAGE_COUNT 
       }, function (data, error) {
       if(error)
       {
@@ -168,45 +170,12 @@ module.exports = function (app, config) {
     });
   });
 
-  app.get("/raw", (req, res, next) => {
-    FetchDNLAData(config, 
-      { 
-        objectId: "0", 
-        startingIndex: 0, 
-        requestedCount: 0 
-      }, function (data, error) {
-      if(error)
-      {
-        res.json(CreateErrorResult(error));
-        return;
-      }
-      res.json(data);
-    });
-  });
-
-
-  app.get("/browse/:id", (req, res, next) => {
+  app.get("/browse/:id/:page", (req, res, next) => {
     FetchDNLAData(config, 
       { 
         objectId: req.params["id"], 
-        startingIndex: 0, 
-        requestedCount: 0 
-      }, function (data, error) {
-      if(error)
-      {
-        res.json(CreateErrorResult(error));
-        return;
-      }
-      res.json(ProcessDNLAData(data));
-    });
-  });
-
-  app.get("/browse", (req, res, next) => {
-    FetchDNLAData(config, 
-      { 
-        objectId: "0", 
-        startingIndex: 0, 
-        requestedCount: 0 
+        startingIndex: (req.params["page"] ? req.params["page"] : 0) * ITEM_PAGE_COUNT, 
+        requestedCount: ITEM_PAGE_COUNT 
       }, function (data, error) {
       if(error)
       {

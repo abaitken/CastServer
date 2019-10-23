@@ -33,7 +33,7 @@ function ViewModel() {
         break;
       self.breadcrumb.pop();
     }
-    
+
     self.set_currentContainerId(id);
   };
 
@@ -41,16 +41,20 @@ function ViewModel() {
     self._breadcrumbJumpImpl(item['id']);
   };
 
-  self.switchFolderView = function (id) {
-    self.focusItem(false);
-    var url = "/browse/" + id;
+  self.requestData = function (id, page) {
+    var url = "/browse/" + id + "/" + page;
     $.ajax({
       type: "GET",
       url: url,
       dataType: "json",
       mimeType: "application/json",
       success: function (data) {
-        self.folderData(data.items);
+
+        for (var i = 0; i < data.items.length; i++) {
+          self.folderData.push(data.items[i]);
+        }
+        if(data.items.length > 0)
+          self.requestData(id, page + 1);
         self.messages('');
       },
       error: function (jqXHR, textStatus, errorThrown) {
@@ -60,6 +64,13 @@ function ViewModel() {
         $("#track-info").html("Error: " + errorThrown);
       }
     });
+  };
+
+  self.switchFolderView = function (id) {
+    self.focusItem(false);
+    self.folderData([]);
+
+    self.requestData(id, 0);
   };
 
   self._determineItemType = function (classType) {
@@ -98,16 +109,14 @@ function ViewModel() {
     }
   };
 
-  self.get_currentContainerId = function()
-  {
-    if(window.location.hash.length <= 1)
+  self.get_currentContainerId = function () {
+    if (window.location.hash.length <= 1)
       return '0';
-    
+
     return window.location.hash.substr(1);
   };
 
-  self.set_currentContainerId = function(value)
-  {    
+  self.set_currentContainerId = function (value) {
     window.location.hash = "#" + value;
   };
 
@@ -121,7 +130,7 @@ function ViewModel() {
       title: 'Root',
       id: '0'
     })
-    
+
     self.switchFolderView(self.get_currentContainerId());
 
     $.ajax({
