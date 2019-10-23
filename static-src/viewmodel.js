@@ -74,6 +74,19 @@ function ViewModel() {
     return ITEM_TYPES.UNKNOWN;
   };
 
+  self.canPlay = function(item)
+  {
+    var itemType = self._determineItemType(item['class']);
+    switch(itemType)
+    {
+      case ITEM_TYPES.CONTAINER:
+      case ITEM_TYPES.MUSIC:
+        return true;
+      default:
+        return false;
+    } 
+  };
+
   self.itemClicked = function (item) {
     if (self._determineItemType(item['class']) == ITEM_TYPES.CONTAINER) {
       self.breadcrumb.push(item);
