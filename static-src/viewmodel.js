@@ -17,7 +17,6 @@ function ViewModel() {
   var self = this;
   self.ITEM_TYPES = ITEM_TYPES;
 
-  self.dataReady = ko.observable(false);
   self.messages = ko.observable("Fetching...");
   self.folderData = ko.observableArray();
   self.playlist = ko.observableArray();
@@ -34,7 +33,8 @@ function ViewModel() {
         break;
       self.breadcrumb.pop();
     }
-    self.switchFolderView(id);
+    
+    self.set_currentContainerId(id);
   };
 
   self.breadcrumbJump = function (item) {
@@ -43,7 +43,6 @@ function ViewModel() {
 
   self.switchFolderView = function (id) {
     self.focusItem(false);
-    window.location.href = "#" + id;
     var url = "/browse/" + id;
     $.ajax({
       type: "GET",
@@ -52,6 +51,7 @@ function ViewModel() {
       mimeType: "application/json",
       success: function (data) {
         self.folderData(data.items);
+        self.messages('');
       },
       error: function (jqXHR, textStatus, errorThrown) {
         self.messages(errorThrown);
@@ -74,23 +74,21 @@ function ViewModel() {
     return ITEM_TYPES.UNKNOWN;
   };
 
-  self.canPlay = function(item)
-  {
+  self.canPlay = function (item) {
     var itemType = self._determineItemType(item['class']);
-    switch(itemType)
-    {
+    switch (itemType) {
       case ITEM_TYPES.CONTAINER:
       case ITEM_TYPES.MUSIC:
         return true;
       default:
         return false;
-    } 
+    }
   };
 
   self.itemClicked = function (item) {
     if (self._determineItemType(item['class']) == ITEM_TYPES.CONTAINER) {
       self.breadcrumb.push(item);
-      self.switchFolderView(item['id']);
+      self.set_currentContainerId(item['id']);
       return;
     }
 
@@ -100,14 +98,31 @@ function ViewModel() {
     }
   };
 
+  self.get_currentContainerId = function()
+  {
+    if(window.location.hash.length <= 1)
+      return '0';
+    
+    return window.location.hash.substr(1);
+  };
+
+  self.set_currentContainerId = function(value)
+  {    
+    window.location.hash = "#" + value;
+  };
+
   self.Init = function () {
     ko.applyBindings(self);
+    window.onhashchange = function () {
+      self.switchFolderView(self.get_currentContainerId());
+    };
+
     self.breadcrumb.push({
       title: 'Root',
       id: '0'
     })
-    self.switchFolderView('0');
-
+    
+    self.switchFolderView(self.get_currentContainerId());
 
     $.ajax({
       type: "GET",
@@ -116,6 +131,7 @@ function ViewModel() {
       mimeType: "application/json",
       success: function (data) {
         self.playlist(data);
+        self.messages('');
       },
       error: function (jqXHR, textStatus, errorThrown) {
         self.messages(errorThrown);
@@ -124,8 +140,6 @@ function ViewModel() {
         $("#track-info").html("Error: " + errorThrown);
       }
     });
-
-    self.dataReady(true);
   };
 
 }
