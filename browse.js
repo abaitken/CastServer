@@ -73,7 +73,7 @@ function RestructureEntities(o) {
   return result;
 }
 
-function FetchDNLAData(config, objectId, callback) {
+function FetchDNLAData(config, requestInfo, callback) {
   var request = require("request-promise-native");
 
   var requestBody =
@@ -82,12 +82,12 @@ function FetchDNLAData(config, objectId, callback) {
     "<s:Body>" +
     '<u:Browse xmlns:u="urn:schemas-upnp-org:service:ContentDirectory:1">' +
     "<ObjectID>" +
-    objectId +
+    requestInfo.objectId +
     "</ObjectID>" +
     "<BrowseFlag>BrowseDirectChildren</BrowseFlag>" +
     "<Filter>*</Filter>" +
-    "<StartingIndex>0</StartingIndex>" +
-    "<RequestedCount>0</RequestedCount>" +
+    "<StartingIndex>" + requestInfo.startingIndex + "</StartingIndex>" +
+    "<RequestedCount>" + requestInfo.requestedCount + "</RequestedCount>" +
     "<SortCriteria></SortCriteria>" +
     "</u:Browse>" +
     "</s:Body>" +
@@ -151,9 +151,15 @@ function ProcessDNLAData(data)
 
 module.exports = function (app, config) {
 
+  // TODO : Consider conditionally including these only on DEV environments
   app.get("/raw/:id", (req, res, next) => {
-    FetchDNLAData(config, req.params["id"], function (data, error) {
-      if(error)// TODO : Is this correct, doesnt seem to work
+    FetchDNLAData(config, 
+      { 
+        objectId: req.params["id"], 
+        startingIndex: 0, 
+        requestedCount: 0 
+      }, function (data, error) {
+      if(error)
       {
         res.json(CreateErrorResult(error));
         return;
@@ -163,8 +169,13 @@ module.exports = function (app, config) {
   });
 
   app.get("/raw", (req, res, next) => {
-    FetchDNLAData(config, "0", function (data, error) {
-      if(error)// TODO : Is this correct, doesnt seem to work
+    FetchDNLAData(config, 
+      { 
+        objectId: "0", 
+        startingIndex: 0, 
+        requestedCount: 0 
+      }, function (data, error) {
+      if(error)
       {
         res.json(CreateErrorResult(error));
         return;
@@ -175,8 +186,13 @@ module.exports = function (app, config) {
 
 
   app.get("/browse/:id", (req, res, next) => {
-    FetchDNLAData(config, req.params["id"], function (data, error) {
-      if(error)// TODO : Is this correct, doesnt seem to work
+    FetchDNLAData(config, 
+      { 
+        objectId: req.params["id"], 
+        startingIndex: 0, 
+        requestedCount: 0 
+      }, function (data, error) {
+      if(error)
       {
         res.json(CreateErrorResult(error));
         return;
@@ -186,8 +202,13 @@ module.exports = function (app, config) {
   });
 
   app.get("/browse", (req, res, next) => {
-    FetchDNLAData(config, "0", function (data, error) {
-      if(error)// TODO : Is this correct, doesnt seem to work
+    FetchDNLAData(config, 
+      { 
+        objectId: "0", 
+        startingIndex: 0, 
+        requestedCount: 0 
+      }, function (data, error) {
+      if(error)
       {
         res.json(CreateErrorResult(error));
         return;
@@ -200,7 +221,12 @@ module.exports = function (app, config) {
     var lastPosition = req.params["id"].lastIndexOf("$");
     var parentId = req.params["id"].substr(0, lastPosition);
 
-    FetchDNLAData(config, parentId, function (dnlaData, error) {
+    FetchDNLAData(config, 
+      { 
+        objectId: parentId, 
+        startingIndex: 0, 
+        requestedCount: 0 
+      }, function (dnlaData, error) {
       
       if(error)// TODO : Is this correct, doesnt seem to work
       {
