@@ -110,17 +110,19 @@ function FetchDNLAData(config, objectId, callback) {
 
 function CreateErrorResult(error){
   return {
-    container: [],
-    item: [],
+    items: [],
     error: "TODO : More error details"
   };
 }
 
 function ProcessDNLAData(data)
 {  
-  var result = {
-    container: RestructureEntities(data["container"], RestructureContainer),
-    item: RestructureEntities(data["item"], RestructureItem)
+  var containers = RestructureEntities(data["container"], RestructureContainer);
+  var items = RestructureEntities(data["item"], RestructureItem);
+  var resultItems = containers.concat(items);
+
+  var result = {    
+    items: resultItems
   };
   return result;
 }
