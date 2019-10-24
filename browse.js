@@ -193,9 +193,7 @@ class DLNAClient {
       '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">' +
       "<s:Body>" +
       '<u:Browse xmlns:u="urn:schemas-upnp-org:service:ContentDirectory:1">' +
-      "<ObjectID>" +
-      requestInfo.objectId +
-      "</ObjectID>" +
+      "<ObjectID>" + requestInfo.objectId + "</ObjectID>" +
       "<BrowseFlag>BrowseDirectChildren</BrowseFlag>" +
       "<Filter>*</Filter>" +
       "<StartingIndex>" + requestInfo.startingIndex + "</StartingIndex>" +
@@ -224,20 +222,55 @@ class DLNAClient {
       });
   }
 
+  Info(requestInfo, callback) {
+    var requestBody =
+      '<?xml version="1.0"?>' +
+      '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">' +
+      "<s:Body>" +
+      '<u:Browse xmlns:u="urn:schemas-upnp-org:service:ContentDirectory:1">' +
+      "<ObjectID>" + requestInfo.objectId + "</ObjectID>" +
+      "<BrowseFlag>BrowseMetadata</BrowseFlag>" +
+      "<Filter>*</Filter>" +
+      "<StartingIndex>0</StartingIndex>" +
+      "<RequestedCount>0</RequestedCount>" +
+      "<SortCriteria></SortCriteria>" +
+      "</u:Browse>" +
+      "</s:Body>" +
+      "</s:Envelope>";
+
+    this._request(requestBody, "urn:schemas-upnp-org:service:ContentDirectory:1#Browse", requestInfo.timeout,
+      function (body, error) {
+        if (error !== null) {
+          callback(null, error);
+          return;
+        }
+        const getResultRegex = /<Result>(?<DATA>[^]+)<\/Result>/;
+        var match = getResultRegex.exec(body);
+        var data = g_decode(match["groups"]["DATA"]);
+
+        let jsonData;
+        g_parser.parseString(data, function (err, parseResult) {
+          jsonData = parseResult["DIDL-Lite"];
+        });
+
+        callback(jsonData, null);
+      });
+  }
+
   Search(requestInfo, callback) {
     var requestBody =
-    '<?xml version="1.0"?>' +
-    '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">' +
-    "<s:Body>" +
-    //"<ObjectID>" + requestInfo.objectId + "</ObjectID>" +
-    //"<BrowseFlag>BrowseDirectChildren</BrowseFlag>" +
-    "<Filter>*</Filter>" +
-    "<StartingIndex>" + requestInfo.startingIndex + "</StartingIndex>" +
-    "<RequestedCount>" + requestInfo.requestedCount + "</RequestedCount>" +
-    "<SortCriteria>" + requestInfo.sortCriteria + "</SortCriteria>" +
-    "<SearchCriteria>" + requestInfo.searchCriteria + "</SearchCriteria>" +
-    "</s:Body>" +
-    "</s:Envelope>";
+      '<?xml version="1.0"?>' +
+      '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">' +
+      "<s:Body>" +
+      //"<ObjectID>" + requestInfo.objectId + "</ObjectID>" +
+      //"<BrowseFlag>BrowseDirectChildren</BrowseFlag>" +
+      "<Filter>*</Filter>" +
+      "<StartingIndex>" + requestInfo.startingIndex + "</StartingIndex>" +
+      "<RequestedCount>" + requestInfo.requestedCount + "</RequestedCount>" +
+      "<SortCriteria>" + requestInfo.sortCriteria + "</SortCriteria>" +
+      "<SearchCriteria>" + requestInfo.searchCriteria + "</SearchCriteria>" +
+      "</s:Body>" +
+      "</s:Envelope>";
 
     this._request(requestBody, "urn:schemas-upnp-org:service:ContentDirectory:1#Search", requestInfo.timeout,
       function (body, error) {
@@ -377,50 +410,20 @@ module.exports = function (app, config) {
         }
         res.json(ProcessDNLAData(data));
       });
-    
+
   });
 
   app.get("/info/:id", (req, res, next) => {
-    var lastPosition = req.params["id"].lastIndexOf("$");
-    var parentId = req.params["id"].substr(0, lastPosition);
-
-    FetchDNLAData(config,
+    dlnaClient.Info(
       {
-        objectId: parentId,
-        startingIndex: 0,
-        requestedCount: 0,
-        sortCriteria: ''
-      }, function (dnlaData, error) {
-
-        if (error)// TODO : Is this correct, doesnt seem to work
-        {
+        objectId: req.params["id"],
+        timeout: config.dlna.timeout
+      }, function (data, error) {
+        if (error) {
           res.json(CreateErrorResult(error));
           return;
         }
-
-        var data = ProcessDNLAData(dnlaData);
-
-        if (data["item"]) {
-          for (var index = 0; index < data["item"].length; index++) {
-            var item = data["item"][index];
-
-            if (item["id"] == req.params["id"]) {
-              res.json(item);
-              return;
-            }
-          }
-        }
-        if (data["container"]) {
-          for (var index = 0; index < data["container"].length; index++) {
-            var item = data["container"][index];
-            if (item["id"] == req.params["id"]) {
-              res.json(item);
-              return;
-            }
-          }
-        }
-
-        res.json({});
+        res.json(ProcessDNLAData(data));
       });
   });
 };
