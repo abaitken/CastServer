@@ -19,7 +19,7 @@
     <div data-bind="text: messages" class="alert alert-info" role="alert" id="messages">
     </div>
     <!-- /ko -->
-    
+
     <div class="row">
 
       <div class="col-md-9 ml-sm-auto col-lg-10 px-4">
@@ -82,8 +82,16 @@
           <!-- /ko -->
 
           <h4>PLAYLIST</h4>
-          <div data-bind="foreach: playlist">
-            <p data-bind="text: title"></p>
+          <div data-bind="foreach: playlist" class="container">
+            <div class="row">
+              <span data-bind="text: title"></span>
+              <span class="float-right">
+                <button type="button" class="btn btn-default"
+                  data-bind="click: $root.removeEntityFromPlaylist, clickBubble: false">
+                  <i class="fas fa-minus-square"></i>
+                </button>
+              </span>
+            </div>
           </div>
 
         </div>

@@ -28,6 +28,12 @@ function ViewModel() {
     self.playlist.push(item);
   };
 
+  self.removeEntityFromPlaylist = function(item) {
+    var itemIndex = self.playlist.indexOf(item);
+    if(itemIndex !== -1)
+      self.playlist.splice(itemIndex, 1);
+  };
+
   self.breadcrumbJump = function (item) {
     self.set_currentContainerId(item['id']);
   };
