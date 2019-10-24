@@ -262,7 +262,7 @@ class DLNAClient {
       '<?xml version="1.0"?>' +
       '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">' +
       "<s:Body>" +
-      //"<ObjectID>" + requestInfo.objectId + "</ObjectID>" +
+      "<ObjectID>" + requestInfo.objectId + "</ObjectID>" +
       //"<BrowseFlag>BrowseDirectChildren</BrowseFlag>" +
       "<Filter>*</Filter>" +
       "<StartingIndex>" + requestInfo.startingIndex + "</StartingIndex>" +
@@ -294,8 +294,6 @@ class DLNAClient {
 }
 
 function CreateErrorResult(body, error) {
-  console.log(error);
-
   return {
     items: [],
     error: error.message
@@ -395,11 +393,11 @@ module.exports = function (app, config) {
       });
   });
 
-  app.get("/search/:criteria/:page", (req, res, next) => {
+  app.get("/search/:id/:criteria/:page", (req, res, next) => {
     dlnaClient.Search(
       {
-        //objectId: req.params["id"],
-        searchCriteria: req.params['criteria'],
+        objectId: req.params["id"],
+        searchCriteria: 'dc:title = "' + req.params['criteria'] + '"',
         startingIndex: (req.params["page"] ? req.params["page"] : 0) * ITEM_PAGE_COUNT,
         requestedCount: ITEM_PAGE_COUNT,
         sortCriteria: '+upnp:class,+dc:title',
