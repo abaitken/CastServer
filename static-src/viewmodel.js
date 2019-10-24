@@ -10,7 +10,8 @@ import './custom.scss';
 var ITEM_TYPES = {
   UNKNOWN: 0,
   CONTAINER: 1,
-  MUSIC: 2
+  MUSIC: 2,
+  PHOTO: 3
 };
 
 function ViewModel() {
@@ -70,6 +71,10 @@ function ViewModel() {
 
     if (classType.toLowerCase().indexOf('track') !== -1) {
       return ITEM_TYPES.MUSIC;
+    }
+
+    if (classType.toLowerCase().indexOf('photo') !== -1) {
+      return ITEM_TYPES.PHOTO;
     }
 
     return ITEM_TYPES.UNKNOWN;

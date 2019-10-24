@@ -14,11 +14,11 @@ body {
   background-color: #cccccc;
 } */
 
-.clickItem {
+.clickable {
   cursor: pointer;
 }
 
-.itemCell {
+.folderItemCell {
   border-top-left-radius: 0.25rem;
   border-top-right-radius: 0.25rem;
   background-color: #f8f9fa;
@@ -26,4 +26,18 @@ body {
   border: 1px solid #aaaaaa;
 }
 
-@import './node_modules/bootstrap/dist/css/bootstrap.min.css';
+.folderItemIcon {
+  vertical-align: middle;
+  margin: 0.5rem;
+}
+
+.folderItemTitle {
+  vertical-align: middle;
+  margin: 0.5rem;
+}
+
+.folderItemsRegion {
+  max-height: 70vh;
+}
+
+@import "./node_modules/bootstrap/dist/css/bootstrap.min.css";
