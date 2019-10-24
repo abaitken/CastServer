@@ -122,7 +122,7 @@ class DLNAClient {
     this._request(requestBody, "urn:schemas-upnp-org:service:ContentDirectory:1#GetSearchCapabilities", requestInfo.timeout,
       function (body, error) {
         if (error !== null) {
-          callback(null, error);
+          callback(body, error);
           return;
         }
 
@@ -148,7 +148,7 @@ class DLNAClient {
     this._request(requestBody, "urn:schemas-upnp-org:service:ContentDirectory:1#GetSortCapabilities", requestInfo.timeout,
       function (body, error) {
         if (error !== null) {
-          callback(null, error);
+          callback(body, error);
           return;
         }
 
@@ -174,7 +174,7 @@ class DLNAClient {
     this._request(requestBody, "urn:schemas-upnp-org:service:ContentDirectory:1#GetSystemUpdateID", requestInfo.timeout,
       function (body, error) {
         if (error !== null) {
-          callback(null, error);
+          callback(body, error);
           return;
         }
 
@@ -206,7 +206,7 @@ class DLNAClient {
     this._request(requestBody, "urn:schemas-upnp-org:service:ContentDirectory:1#Browse", requestInfo.timeout,
       function (body, error) {
         if (error !== null) {
-          callback(null, error);
+          callback(body, error);
           return;
         }
         const getResultRegex = /<Result>(?<DATA>[^]+)<\/Result>/;
@@ -241,7 +241,7 @@ class DLNAClient {
     this._request(requestBody, "urn:schemas-upnp-org:service:ContentDirectory:1#Browse", requestInfo.timeout,
       function (body, error) {
         if (error !== null) {
-          callback(null, error);
+          callback(body, error);
           return;
         }
         const getResultRegex = /<Result>(?<DATA>[^]+)<\/Result>/;
@@ -275,7 +275,7 @@ class DLNAClient {
     this._request(requestBody, "urn:schemas-upnp-org:service:ContentDirectory:1#Search", requestInfo.timeout,
       function (body, error) {
         if (error !== null) {
-          callback(null, error);
+          callback(body, error);
           return;
         }
         const getResultRegex = /<Result>(?<DATA>[^]+)<\/Result>/;
@@ -293,11 +293,12 @@ class DLNAClient {
 
 }
 
-function CreateErrorResult(error) {
+function CreateErrorResult(body, error) {
   console.log(error);
+
   return {
     items: [],
-    error: "TODO : More error details"
+    error: error.message
   };
 }
 
@@ -370,7 +371,7 @@ module.exports = function (app, config) {
         timeout: config.dlna.timeout
       }, function (data, error) {
         if (error) {
-          res.json(CreateErrorResult(error));
+          res.json(CreateErrorResult(data, error));
           return;
         }
         res.json(data);
@@ -387,7 +388,7 @@ module.exports = function (app, config) {
         timeout: config.dlna.timeout
       }, function (data, error) {
         if (error) {
-          res.json(CreateErrorResult(error));
+          res.json(CreateErrorResult(data, error));
           return;
         }
         res.json(ProcessDNLAData(data));
@@ -405,7 +406,7 @@ module.exports = function (app, config) {
         timeout: config.dlna.timeout
       }, function (data, error) {
         if (error) {
-          res.json(CreateErrorResult(error));
+          res.json(CreateErrorResult(data, error));
           return;
         }
         res.json(ProcessDNLAData(data));
@@ -420,7 +421,7 @@ module.exports = function (app, config) {
         timeout: config.dlna.timeout
       }, function (data, error) {
         if (error) {
-          res.json(CreateErrorResult(error));
+          res.json(CreateErrorResult(data, error));
           return;
         }
         res.json(ProcessDNLAData(data));
