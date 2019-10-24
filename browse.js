@@ -422,7 +422,7 @@ module.exports = function (app, config) {
           res.json(CreateErrorResult(data, error));
           return;
         }
-        res.json(ProcessDNLAData(data));
+        res.json(ProcessDNLAData(data).items[0]);
       });
   });
 };

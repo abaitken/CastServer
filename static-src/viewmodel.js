@@ -27,18 +27,8 @@ function ViewModel() {
     self.playlist.push(item);
   };
 
-  self._breadcrumbJumpImpl = function (id) {
-    for (var i = self.breadcrumb().length - 1; i > 0; i--) {
-      if (self.breadcrumb()[i]['id'] == id)
-        break;
-      self.breadcrumb.pop();
-    }
-
-    self.set_currentContainerId(id);
-  };
-
   self.breadcrumbJump = function (item) {
-    self._breadcrumbJumpImpl(item['id']);
+    self.set_currentContainerId(item['id']);
   };
 
   self.requestData = function (id, page) {
@@ -53,7 +43,7 @@ function ViewModel() {
         for (var i = 0; i < data.items.length; i++) {
           self.folderData.push(data.items[i]);
         }
-        if(data.items.length > 0)
+        if (data.items.length > 0)
           self.requestData(id, page + 1);
         self.messages('');
       },
@@ -120,17 +110,61 @@ function ViewModel() {
     window.location.hash = "#" + value;
   };
 
+
+  self.requestItemInfo = function (id) {
+    var url = "/info/" + id;
+    return $.ajax({
+      type: "GET",
+      url: url,
+      dataType: "json",
+      mimeType: "application/json"
+    });
+  };
+
+  self._getBreadCrumbIndex = function (id) {
+    for (var i = self.breadcrumb().length - 1; i > 0; i--) {
+      if (self.breadcrumb()[i]['id'] == id)
+        return i;
+    }
+    return -1;
+  };
+
+  self._updateBreadCrumb = async function () {
+    var currentId = self.get_currentContainerId();
+    var breadCrumbIndex = self._getBreadCrumbIndex(currentId);
+
+    if (breadCrumbIndex === -1) {
+      var newBreadcrumb = [];
+
+      var currentId = self.get_currentContainerId();
+      while (currentId != '-1') {
+
+        await self.requestItemInfo(currentId)
+          .done(function (data) {
+            newBreadcrumb.splice(0, 0, data);
+            currentId = data['parentID'];
+          })
+          .fail(function (xhr) {
+            console.error(xhr);
+          });
+      }
+
+      self.breadcrumb(newBreadcrumb);
+    }
+    else {
+      var newBreadcrumb = self.breadcrumb();
+      self.breadcrumb(newBreadcrumb.slice(0, breadCrumbIndex + 1));
+    }
+  };
+
   self.Init = function () {
     ko.applyBindings(self);
     window.onhashchange = function () {
+      self._updateBreadCrumb();
       self.switchFolderView(self.get_currentContainerId());
     };
 
-    self.breadcrumb.push({
-      title: 'Root',
-      id: '0'
-    })
-
+    self._updateBreadCrumb();
     self.switchFolderView(self.get_currentContainerId());
 
     $.ajax({
