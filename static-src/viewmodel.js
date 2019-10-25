@@ -76,7 +76,7 @@ function ViewModel() {
   };
 
   self.clearPlaylist = function () {
-    self._serviceRequest('playlist', 'list')
+    self._serviceRequest('playlist', 'clear')
       .done(function (data) {
         self.playlist([]);
       })
