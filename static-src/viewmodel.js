@@ -227,6 +227,9 @@ function ViewModel() {
     }
   };
 
+
+  /* INIT */
+
   self.Init = function () {
     ko.applyBindings(self);
 
@@ -241,6 +244,72 @@ function ViewModel() {
 
     // Init Playlist
     self.updatePlaylist();
+
+
+    /* BEGIN WEBSOCKET Fns */
+    var socketUrl = '';
+    if (window.location.protocol === "https:") {
+      socketUrl = "wss:";
+    } else {
+      socketUrl = "ws:";
+    }
+    socketUrl += "//" + window.location.host;
+    socketUrl += window.location.pathname;
+    if (socketUrl.lastIndexOf('/') != socketUrl.length - 1)
+      socketUrl += "/";
+    socketUrl += "ws";
+
+    // TODO : Handle disconnections, try to reconnect?
+    // TODO : PING/PONG to prevent timeouts?
+    self.webSocket = new WebSocket(socketUrl);
+
+    // self.webSocket.onerror = function(event) {
+    //   console.log("SOCKET.ONERROR:" + event.data);
+    // };
+
+    // self.webSocket.onopen = function(event) {
+    //   console.log("SOCKET.ONOPEN:" + event.data);
+    // };
+
+    self.webSocket.onmessage = function (event) {
+      //console.log("SOCKET.ONMESSAGE:" + event.data);
+      var data = JSON.parse(event.data);
+
+      if (!data['category']) {
+        console.log("Unexpected socket data: " + event.data);
+        return;
+      }
+
+      switch (data['category']) {
+        case 'playlist':
+          if (!data['action']) {
+            console.log("No action for playlist category");
+            return;
+          }
+
+          switch (data['action']) {
+            case 'add':
+                // TODO : Implement
+                // data['id']
+              break;
+            case 'remove':
+              // TODO : Implement
+              // data['id']
+              break;
+            case 'clear':
+              self.clearPlaylist();
+              break;
+            default:
+              console.log("Unexpected action: " + data['action']);
+              break;
+          }
+          break;
+        default:
+          console.log("Unexpected category: " + data['category']);
+          break;
+      }
+    };
+
   };
 
 }

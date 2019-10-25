@@ -1,18 +1,21 @@
+var http = require('http');
 var config = require('./config.json');
 
 var express = require("express");
-var app = express();
+const app = express();
+
+app.use(express.static('static'));
+const server = http.createServer(app);
+
+var notifications = require('./notifications.js');
+var notifier = new notifications.Notifier(server);
 
 require("./browse")(app, config);
 require("./cast")(app, config);
-require("./playlist")(app, config);
+require("./playlist")(app, notifier, config);
 
-app.use(express.static('static'));
-
-var listenPort = 3000;
-
-app.listen(listenPort, () => {
-  console.log("Server running on port " + listenPort);
+server.listen(config.server.listenPort, () => {
+  console.log("Server running on port " + config.server.listenPort);
 });
 
 // TODO : Conditionally execute this code when running as a service

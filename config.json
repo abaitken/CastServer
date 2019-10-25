@@ -1,10 +1,13 @@
 {
+    "server": {
+        "listenPort": 3000
+    },
     "dlna": {
         "protocol": "http",
         "domain": "dnla.services.lan",
         "timeout": 5000
     },
-    "devices":[
+    "devices": [
         {
             "type": "chromecast",
             "id": "Lounge",

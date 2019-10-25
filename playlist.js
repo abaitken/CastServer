@@ -10,7 +10,7 @@ function CreateErrorResult(body, error) {
   };
 }
 
-module.exports = function (app, config) {
+module.exports = function (app, notifier, config) {
   var dlnaClient = new DLNAClient(config.dlna.protocol, config.dlna.domain);
 
   app.get("/playlist/list", (req, res, next) => {
@@ -30,6 +30,7 @@ module.exports = function (app, config) {
         }
         g_playlist.push(ProcessDNLAData(data).items[0]);
         res.json("OK");
+        notifier.NotifyClients({ "category": "playlist", "action": "add", "id": req.params["id"] });
       });
 
   });
@@ -48,6 +49,7 @@ module.exports = function (app, config) {
         if (itemIndex !== -1)
           g_playlist.splice(itemIndex, 1);
         res.json("OK");
+        notifier.NotifyClients({ "category": "playlist", "action": "remove", "id": req.params["id"] });
       });
 
   });
@@ -59,6 +61,7 @@ module.exports = function (app, config) {
   app.get("/playlist/clear", (req, res, next) => {
     g_playlist = [];
     res.json("OK");
+    notifier.NotifyClients({ "category": "playlist", "action": "clear" });
   });
 
 };
