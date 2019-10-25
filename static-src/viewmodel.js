@@ -19,48 +19,116 @@ function ViewModel() {
   self.ITEM_TYPES = ITEM_TYPES;
 
   self.messages = ko.observable("Fetching...");
-  self.folderData = ko.observableArray();
   self.playlist = ko.observableArray();
-  self.breadcrumb = ko.observableArray();
-  self.focusItem = ko.observable(false);
+
+  /* COMMON */
+  self._serviceRequest = function (action, urlArgs) {
+    var url = "/" + action;
+    if (Array.isArray(urlArgs)) {
+      for (let index = 0; index < urlArgs.length; index++) {
+        const item = urlArgs[index];
+
+        url = url + "/" + item;
+      }
+    }
+    else if (urlArgs) {
+      url = url + "/" + urlArgs;
+    }
+
+    return $.ajax({
+      type: "GET",
+      url: url,
+      dataType: "json",
+      mimeType: "application/json"
+    });
+  }
+
+  /* BEGIN PLAYLIST Fns */
 
   self.addEntityToPlaylist = function (item) {
-    self.playlist.push(item);
+    self._serviceRequest('playlist', ['add', item['id']])
+      .done(function (data) {
+        self.playlist.push(item);
+      })
+      .fail(function (jqXHR, textStatus, errorThrown) {
+        self.messages(errorThrown);
+        $("#messages").attr("class", "alert alert-danger");
+        // TODO : Text not displaying correctly
+        $("#track-info").html("Error: " + errorThrown);
+      });
   };
 
-  self.removeEntityFromPlaylist = function(item) {
-    var itemIndex = self.playlist.indexOf(item);
-    if(itemIndex !== -1)
-      self.playlist.splice(itemIndex, 1);
+  self.removeEntityFromPlaylist = function (item) {
+
+    self._serviceRequest('playlist', ['remove', item['id']])
+      .done(function (data) {
+        var itemIndex = self.playlist.indexOf(item);
+        if (itemIndex !== -1)
+          self.playlist.splice(itemIndex, 1);
+      })
+      .fail(function (jqXHR, textStatus, errorThrown) {
+        self.messages(errorThrown);
+        $("#messages").attr("class", "alert alert-danger");
+        // TODO : Text not displaying correctly
+        $("#track-info").html("Error: " + errorThrown);
+      });
+
   };
+
+  self.clearPlaylist = function () {
+    self._serviceRequest('playlist', 'list')
+      .done(function (data) {
+        self.playlist([]);
+      })
+      .fail(function (jqXHR, textStatus, errorThrown) {
+        self.messages(errorThrown);
+        $("#messages").attr("class", "alert alert-danger");
+        // TODO : Text not displaying correctly
+        $("#track-info").html("Error: " + errorThrown);
+      });
+  };
+
+  self.updatePlaylist = function () {
+    self._serviceRequest('playlist', 'list')
+      .done(function (data) {
+        self.playlist(data);
+        self.messages('');
+      })
+      .fail(function (jqXHR, textStatus, errorThrown) {
+        self.messages(errorThrown);
+        $("#messages").attr("class", "alert alert-danger");
+        // TODO : Text not displaying correctly
+        $("#track-info").html("Error: " + errorThrown);
+      });
+  };
+
+
+  /* BEGIN BROWSING Fns */
+  self.folderData = ko.observableArray();
+  self.breadcrumb = ko.observableArray();
+  self.focusItem = ko.observable(false);
 
   self.breadcrumbJump = function (item) {
     self.set_currentContainerId(item['id']);
   };
 
   self.requestData = function (id, page) {
-    var url = "/browse/" + id + "/" + page;
-    $.ajax({
-      type: "GET",
-      url: url,
-      dataType: "json",
-      mimeType: "application/json",
-      success: function (data) {
 
+    self._serviceRequest('browse', [id, page])
+      .done(function (data) {
         for (var i = 0; i < data.items.length; i++) {
           self.folderData.push(data.items[i]);
         }
         if (data.items.length > 0)
           self.requestData(id, page + 1);
         self.messages('');
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
+      })
+      .fail(function (jqXHR, textStatus, errorThrown) {
         self.messages(errorThrown);
         $("#messages").attr("class", "alert alert-danger");
         // TODO : Text not displaying correctly
         $("#track-info").html("Error: " + errorThrown);
-      }
-    });
+      });
   };
 
   self.switchFolderView = function (id) {
@@ -121,17 +189,6 @@ function ViewModel() {
     window.location.hash = "#" + value;
   };
 
-
-  self.requestItemInfo = function (id) {
-    var url = "/info/" + id;
-    return $.ajax({
-      type: "GET",
-      url: url,
-      dataType: "json",
-      mimeType: "application/json"
-    });
-  };
-
   self._getBreadCrumbIndex = function (id) {
     for (var i = self.breadcrumb().length - 1; i > 0; i--) {
       if (self.breadcrumb()[i]['id'] == id)
@@ -149,14 +206,16 @@ function ViewModel() {
 
       var currentId = self.get_currentContainerId();
       while (currentId != '-1') {
-
-        await self.requestItemInfo(currentId)
+        await self._serviceRequest('info', currentId)
           .done(function (data) {
             newBreadcrumb.splice(0, 0, data);
             currentId = data['parentID'];
           })
-          .fail(function (xhr) {
-            console.error(xhr);
+          .fail(function (jqXHR, textStatus, errorThrown) {
+            self.messages(errorThrown);
+            $("#messages").attr("class", "alert alert-danger");
+            // TODO : Text not displaying correctly
+            $("#track-info").html("Error: " + errorThrown);
           });
       }
 
@@ -170,30 +229,18 @@ function ViewModel() {
 
   self.Init = function () {
     ko.applyBindings(self);
+
     window.onhashchange = function () {
       self._updateBreadCrumb();
       self.switchFolderView(self.get_currentContainerId());
     };
 
+    // Init browsing
     self._updateBreadCrumb();
     self.switchFolderView(self.get_currentContainerId());
 
-    $.ajax({
-      type: "GET",
-      url: '/playlist/list',
-      dataType: "json",
-      mimeType: "application/json",
-      success: function (data) {
-        self.playlist(data);
-        self.messages('');
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        self.messages(errorThrown);
-        $("#messages").attr("class", "alert alert-danger");
-        // TODO : Text not displaying correctly
-        $("#track-info").html("Error: " + errorThrown);
-      }
-    });
+    // Init Playlist
+    self.updatePlaylist();
   };
 
 }

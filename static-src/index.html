@@ -82,13 +82,19 @@
           <!-- /ko -->
 
           <h4>PLAYLIST</h4>
+
+          <button type="button" class="btn btn-default"
+            data-bind="click: $root.clearPlaylist, clickBubble: false">
+            <i class="fas fa-eraser"></i>
+          </button>
+          
           <div data-bind="foreach: playlist" class="container">
             <div class="row">
               <span data-bind="text: title"></span>
               <span class="float-right">
                 <button type="button" class="btn btn-default"
                   data-bind="click: $root.removeEntityFromPlaylist, clickBubble: false">
-                  <i class="fas fa-minus-square"></i>
+                  <i class="fas fa-trash-alt"></i>
                 </button>
               </span>
             </div>
