@@ -14,6 +14,16 @@ body {
   background-color: #cccccc;
 } */
 
+.selectedCommand
+{
+  background-color: #333333;
+}
+
+.selectedCommand svg {
+  -webkit-filter: invert(100%); /* safari 6.0 - 9.0 */
+          filter: invert(100%);
+}
+
 .clickable {
   cursor: pointer;
 }

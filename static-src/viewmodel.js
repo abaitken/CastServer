@@ -256,13 +256,11 @@ function ViewModel() {
       socketUrl += "/";
     socketUrl += "ws";
 
-    // TODO : Handle disconnections, try to reconnect?
     // TODO : PING/PONG to prevent timeouts?
     self.webSocket = new WebSocket(socketUrl);
 
     self.webSocket.onclose = function(event) {
-      setTimeout(function(){self.socketConnect();}, 1000);
-      
+      setTimeout(function(){self.socketConnect();}, 1000);      
     };
 
     self.webSocket.onmessage = async function (event) {
@@ -312,6 +310,23 @@ function ViewModel() {
 
   };
 
+  self._focusContainer = function(containerPrefix){
+    const selectedClass = 'selectedCommand';
+    $('.viewCommand').removeClass(selectedClass);
+    $('.viewContainer').hide();
+
+    $('#' + containerPrefix + 'Command').addClass(selectedClass);
+    $('#' + containerPrefix + 'Container').show();
+  };
+
+  self.browseCommand = function(){
+    self._focusContainer('browse');
+  };
+
+  self.playlistCommand = function(){
+    self._focusContainer('playlist');
+  };
+
   self.Init = function () {
     ko.applyBindings(self);
 
@@ -319,6 +334,8 @@ function ViewModel() {
       self._updateBreadCrumb();
       self.switchFolderView(self.get_currentContainerId());
     };
+
+    self.browseCommand();
 
     // Init browsing
     self._updateBreadCrumb();
