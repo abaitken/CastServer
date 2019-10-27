@@ -48,7 +48,7 @@ function ViewModel() {
   self.addEntityToPlaylist = function (item) {
     self._serviceRequest('playlist', ['add', item['id']])
       .done(function (data) {
-        self.playlist.push(item);
+        // NOTE : Socket message will come back to indicate that a playlist item was added
       })
       .fail(function (jqXHR, textStatus, errorThrown) {
         self.messages(errorThrown);
@@ -58,13 +58,27 @@ function ViewModel() {
       });
   };
 
+  self.indexOfArrayEx = function (array, propertyName, value) {
+    for (let index = 0; index < array.length; index++) {
+      const element = array[index];
+      if (element[propertyName] === value)
+        return index;
+    }
+
+    return -1;
+  };
+
+  self._removePlaylistItemImpl = function (id) {
+    var itemIndex = self.indexOfArrayEx(self.playlist(), 'id', id);
+    if (itemIndex !== -1)
+      self.playlist.splice(itemIndex, 1);
+  };
+
   self.removeEntityFromPlaylist = function (item) {
 
     self._serviceRequest('playlist', ['remove', item['id']])
       .done(function (data) {
-        var itemIndex = self.playlist.indexOf(item);
-        if (itemIndex !== -1)
-          self.playlist.splice(itemIndex, 1);
+        self._removePlaylistItemImpl(item['id']);
       })
       .fail(function (jqXHR, textStatus, errorThrown) {
         self.messages(errorThrown);
@@ -229,24 +243,7 @@ function ViewModel() {
 
 
   /* INIT */
-
-  self.Init = function () {
-    ko.applyBindings(self);
-
-    window.onhashchange = function () {
-      self._updateBreadCrumb();
-      self.switchFolderView(self.get_currentContainerId());
-    };
-
-    // Init browsing
-    self._updateBreadCrumb();
-    self.switchFolderView(self.get_currentContainerId());
-
-    // Init Playlist
-    self.updatePlaylist();
-
-
-    /* BEGIN WEBSOCKET Fns */
+  self.socketConnect = function(){
     var socketUrl = '';
     if (window.location.protocol === "https:") {
       socketUrl = "wss:";
@@ -263,16 +260,12 @@ function ViewModel() {
     // TODO : PING/PONG to prevent timeouts?
     self.webSocket = new WebSocket(socketUrl);
 
-    // self.webSocket.onerror = function(event) {
-    //   console.log("SOCKET.ONERROR:" + event.data);
-    // };
+    self.webSocket.onclose = function(event) {
+      setTimeout(function(){self.socketConnect();}, 1000);
+      
+    };
 
-    // self.webSocket.onopen = function(event) {
-    //   console.log("SOCKET.ONOPEN:" + event.data);
-    // };
-
-    self.webSocket.onmessage = function (event) {
-      //console.log("SOCKET.ONMESSAGE:" + event.data);
+    self.webSocket.onmessage = async function (event) {
       var data = JSON.parse(event.data);
 
       if (!data['category']) {
@@ -289,12 +282,19 @@ function ViewModel() {
 
           switch (data['action']) {
             case 'add':
-                // TODO : Implement
-                // data['id']
+              await self._serviceRequest('info', data['id'])
+                .done(function (data) {
+                  self.playlist.push(data);
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                  self.messages(errorThrown);
+                  $("#messages").attr("class", "alert alert-danger");
+                  // TODO : Text not displaying correctly
+                  $("#track-info").html("Error: " + errorThrown);
+                });
               break;
             case 'remove':
-              // TODO : Implement
-              // data['id']
+              self._removePlaylistItemImpl(data['id']);
               break;
             case 'clear':
               self.clearPlaylist();
@@ -310,6 +310,25 @@ function ViewModel() {
       }
     };
 
+  };
+
+  self.Init = function () {
+    ko.applyBindings(self);
+
+    window.onhashchange = function () {
+      self._updateBreadCrumb();
+      self.switchFolderView(self.get_currentContainerId());
+    };
+
+    // Init browsing
+    self._updateBreadCrumb();
+    self.switchFolderView(self.get_currentContainerId());
+
+    // Init Playlist
+    self.updatePlaylist();
+
+    self.socketConnect();
+    
   };
 
 }
