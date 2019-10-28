@@ -90,10 +90,10 @@ function ViewModel() {
   };
 
   self.clearPlaylist = function () {
-    if(self.playlist().length === 0)
+    if (self.playlist().length === 0)
       return;
-      
-    if(!confirm("Remove all items from the playlist?"))
+
+    if (!confirm("Remove all items from the playlist?"))
       return;
     self._serviceRequest('playlist', 'clear')
       .done(function (data) {
@@ -248,7 +248,7 @@ function ViewModel() {
 
 
   /* INIT */
-  self.socketConnect = function(){
+  self.socketConnect = function () {
     var socketUrl = '';
     if (window.location.protocol === "https:") {
       socketUrl = "wss:";
@@ -264,8 +264,8 @@ function ViewModel() {
     // TODO : PING/PONG to prevent timeouts?
     self.webSocket = new WebSocket(socketUrl);
 
-    self.webSocket.onclose = function(event) {
-      setTimeout(function(){self.socketConnect();}, 1000);      
+    self.webSocket.onclose = function (event) {
+      setTimeout(function () { self.socketConnect(); }, 1000);
     };
 
     self.webSocket.onmessage = async function (event) {
@@ -315,7 +315,7 @@ function ViewModel() {
 
   };
 
-  self._focusContainer = function(containerPrefix){
+  self._focusContainer = function (containerPrefix) {
     const selectedClass = 'active';
     $('.viewCommand').removeClass(selectedClass);
     $('.viewContainer').hide();
@@ -324,11 +324,11 @@ function ViewModel() {
     $('#' + containerPrefix + 'Container').show();
   };
 
-  self.browseCommand = function(){
+  self.browseCommand = function () {
     self._focusContainer('browse');
   };
 
-  self.playlistCommand = function(){
+  self.playlistCommand = function () {
     self._focusContainer('playlist');
   };
 
@@ -350,8 +350,52 @@ function ViewModel() {
     self.updatePlaylist();
 
     self.socketConnect();
-    
+
   };
+
+
+
+  self.dragOver = function (item, e) {
+    console.log('dragOver');
+    if (e.preventDefault) {
+      e.preventDefault(); // Necessary. Allows us to drop.
+    }
+    e.target.classList.add('over');
+
+    e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+
+    return false;
+  };
+
+  self.dragEnter = function (item, e) {
+    console.log('dragEnter');
+  };
+
+  self.dragLeave = function (item, e) {
+    console.log('dragLeave');
+    //this.classList.remove('over');  // this / e.target is previous target element.
+  };
+
+  self.dragDrop = function (item, e) {
+    console.log('dragDrop');
+    if (e.stopPropagation) {
+      e.stopPropagation(); // Stops some browsers from redirecting.
+    }
+  };
+
+  self.dragStart = function (item, e) {
+    console.log('dragStart');
+
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.target.outerHTML);
+    e.target.classList.add('dragElem');
+  };
+
+  self.dragEnd = function (item, e) {
+    console.log('dragEnd');
+    e.target.classList.remove('over');
+  };
+
 
 }
 
