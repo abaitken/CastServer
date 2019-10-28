@@ -10,7 +10,7 @@
 
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <a class="navbar-brand" href="#">Media Controls</a>
+    <a class="navbar-brand" href="#"><i class="fas fa-broadcast-tower fa-lg fa-inverse"></i> Media Controls</a>
 
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"
@@ -51,38 +51,37 @@
           </ol>
         </nav>
 
-        <div class="container overflow-auto folderItemsRegion">
+        <div class="list-group overflow-auto folderItemsRegion">
           <!-- ko foreach: folderData -->
-          <div class="row">
-            <div class="col clickable folderItemCell" data-bind="click: $root.itemClicked, clickBubble: false">
-              <span class="folderItemIcon">
-                <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.CONTAINER -->
-                <i class="fas fa-folder fa-lg"></i>
-                <!-- /ko -->
-                <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.MUSIC -->
-                <i class="fas fa-music fa-lg"></i>
-                <!-- /ko -->
-                <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.PHOTO -->
-                <i class="fas fa-image fa-lg"></i>
-                <!-- /ko -->
-                <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.UNKNOWN -->
-                <i class="fas fa-question-circle fa-lg"></i>
-                <!-- /ko -->
-              </span>
-              <span class="folderItemTitle" data-bind="text: title"></span>
-              <!-- ko if: $root.canPlay($data) -->
-              <span class="float-right">
-                <button type="button" class="btn btn-default"
-                  data-bind="click: $root.addEntityToPlaylist, clickBubble: false">
-                  <i class="fas fa-stream"></i>
-                </button>
-                <button type="button" class="btn btn-default"
-                  data-bind="click: $root.addEntityToPlaylist, clickBubble: false">
-                  <i class="fas fa-play"></i>
-                </button>
-              </span>
+          <div class="list-group-item d-flex justify-content-between clickable folderItemCell"
+            data-bind="click: $root.itemClicked, clickBubble: false">
+            <span class="folderItemIcon">
+              <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.CONTAINER -->
+              <i class="fas fa-folder fa-lg"></i>
               <!-- /ko -->
-            </div>
+              <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.MUSIC -->
+              <i class="fas fa-music fa-lg"></i>
+              <!-- /ko -->
+              <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.PHOTO -->
+              <i class="fas fa-image fa-lg"></i>
+              <!-- /ko -->
+              <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.UNKNOWN -->
+              <i class="fas fa-question-circle fa-lg"></i>
+              <!-- /ko -->
+            </span>
+            <span class="folderItemTitle" data-bind="text: title"></span>
+            <!-- ko if: $root.canPlay($data) -->
+            <span class="ml-auto">
+              <button type="button" class="btn btn-default"
+                data-bind="click: $root.addEntityToPlaylist, clickBubble: false">
+                <i class="fas fa-stream"></i>
+              </button>
+              <button type="button" class="btn btn-default"
+                data-bind="click: $root.addEntityToPlaylist, clickBubble: false">
+                <i class="fas fa-play"></i>
+              </button>
+            </span>
+            <!-- /ko -->
           </div>
           <!-- /ko -->
 
@@ -103,20 +102,18 @@
         <h2>PLAYLIST</h2>
 
         <button type="button" class="btn btn-default" data-bind="click: $root.clearPlaylist, clickBubble: false">
-          <i class="fas fa-eraser"></i>
+          <i class="fas fa-eraser fa-lg"></i> CLEAR
         </button>
 
-        <div data-bind="foreach: playlist" class="container">
-          <div class="row">
-            <div class="col">
-              <span data-bind="text: title"></span>
-              <span class="float-right">
-                <button type="button" class="btn btn-default"
-                  data-bind="click: $root.removeEntityFromPlaylist, clickBubble: false">
-                  <i class="fas fa-trash-alt"></i>
-                </button>
-              </span>
-            </div>
+        <div data-bind="foreach: playlist" class="list-group">
+          <div class="list-group-item d-flex justify-content-between align-items-center folderItemCell">
+            <span data-bind="text: title"></span>
+            <span class="float-right">
+              <button type="button" class="btn btn-default"
+                data-bind="click: $root.removeEntityFromPlaylist, clickBubble: false">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </span>
           </div>
         </div>
       </div>
