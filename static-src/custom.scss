@@ -1,4 +1,6 @@
-$breadcrumb-divider: quote(">");
+@import "~bootswatch/dist/sandstone/variables";
+@import "~bootstrap/scss/bootstrap";
+@import "~bootswatch/dist/sandstone/bootswatch";
 
 .clickable {
   cursor: pointer;
@@ -7,9 +9,9 @@ $breadcrumb-divider: quote(">");
 .folderItemCell {
   border-top-left-radius: 0.25rem;
   border-top-right-radius: 0.25rem;
-  background-color: theme-color("secondary");
+  background-color: theme-color("light");
   padding: 0.75rem 1.25rem;
-  border: 1px solid theme-color("light");
+  border: 1px solid theme-color("dark");
 }
 
 .folderItemIcon {
@@ -25,7 +27,3 @@ $breadcrumb-divider: quote(">");
 .folderItemsRegion {
   max-height: 70vh;
 }
-
-@import "~bootswatch/dist/flatly/variables";
-@import "~bootstrap/scss/bootstrap";
-@import "~bootswatch/dist/flatly/bootswatch";
