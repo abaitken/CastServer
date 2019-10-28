@@ -311,7 +311,7 @@ function ViewModel() {
   };
 
   self._focusContainer = function(containerPrefix){
-    const selectedClass = 'selectedCommand';
+    const selectedClass = 'active';
     $('.viewCommand').removeClass(selectedClass);
     $('.viewContainer').hide();
 

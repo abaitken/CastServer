@@ -1,28 +1,4 @@
-body {
-  padding-top: 5rem;
-  background: #e5e5e5;
-}
-
-/*TODO*/
-/* $breadcrumb-divider: quote(">"); */
-/* .breadcrumb>li+li:before { padding: 0 5px; color: #ccc; content: ">"; } */
-
-/* .folderItems :nth-child(even){
-  background-color: #eeeeee;
-}
-.folderItems :nth-child(odd){
-  background-color: #cccccc;
-} */
-
-.selectedCommand
-{
-  background-color: #333333;
-}
-
-.selectedCommand svg {
-  -webkit-filter: invert(100%); /* safari 6.0 - 9.0 */
-          filter: invert(100%);
-}
+$breadcrumb-divider: quote(">");
 
 .clickable {
   cursor: pointer;
@@ -31,9 +7,9 @@ body {
 .folderItemCell {
   border-top-left-radius: 0.25rem;
   border-top-right-radius: 0.25rem;
-  background-color: #f8f9fa;
+  background-color: theme-color("secondary");
   padding: 0.75rem 1.25rem;
-  border: 1px solid #aaaaaa;
+  border: 1px solid theme-color("light");
 }
 
 .folderItemIcon {
@@ -50,4 +26,6 @@ body {
   max-height: 70vh;
 }
 
-@import "./node_modules/bootstrap/dist/css/bootstrap.min.css";
+@import "~bootswatch/dist/flatly/variables";
+@import "~bootstrap/scss/bootstrap";
+@import "~bootswatch/dist/flatly/bootswatch";
