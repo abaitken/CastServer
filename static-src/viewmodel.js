@@ -90,6 +90,11 @@ function ViewModel() {
   };
 
   self.clearPlaylist = function () {
+    if(self.playlist().length === 0)
+      return;
+      
+    if(!confirm("Remove all items from the playlist?"))
+      return;
     self._serviceRequest('playlist', 'clear')
       .done(function (data) {
         self.playlist([]);
