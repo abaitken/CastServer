@@ -295,7 +295,7 @@ function ViewModel() {
               self._removePlaylistItemImpl(data['id']);
               break;
             case 'clear':
-              self.clearPlaylist();
+              self.playlist([]);
               break;
             default:
               console.log("Unexpected action: " + data['action']);
