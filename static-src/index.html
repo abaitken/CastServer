@@ -51,50 +51,85 @@
           </ol>
         </nav>
 
-        <div class="list-group overflow-auto folderItemsRegion">
-          <!-- ko foreach: folderData -->
-          <div class="list-group-item d-flex justify-content-between clickable folderItemCell"
-            data-bind="click: $root.itemClicked, clickBubble: false">
-            <span class="folderItemIcon">
-              <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.CONTAINER -->
-              <i class="fas fa-folder fa-lg"></i>
-              <!-- /ko -->
-              <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.MUSIC -->
-              <i class="fas fa-music fa-lg"></i>
-              <!-- /ko -->
-              <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.PHOTO -->
-              <i class="fas fa-image fa-lg"></i>
-              <!-- /ko -->
-              <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.UNKNOWN -->
-              <i class="fas fa-question-circle fa-lg"></i>
-              <!-- /ko -->
-            </span>
-            <span class="folderItemTitle" data-bind="text: title"></span>
-            <!-- ko if: $root.canPlay($data) -->
-            <span class="ml-auto">
-              <button type="button" class="btn btn-default"
-                data-bind="click: $root.addEntityToPlaylist, clickBubble: false">
-                <i class="fas fa-stream"></i>
-              </button>
-              <button type="button" class="btn btn-default"
-                data-bind="click: $root.addEntityToPlaylist, clickBubble: false">
-                <i class="fas fa-play"></i>
-              </button>
-            </span>
+        <div class="row">
+          <div class="col list-group overflow-auto folderItemsRegion">
+            <!-- ko foreach: folderData -->
+            <div class="list-group-item d-flex justify-content-between clickable folderItemCell"
+              data-bind="click: $root.itemClicked, clickBubble: false">
+              <span class="folderItemIcon">
+                <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.CONTAINER -->
+                <i class="fas fa-folder fa-lg"></i>
+                <!-- /ko -->
+                <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.MUSIC -->
+                <i class="fas fa-music fa-lg"></i>
+                <!-- /ko -->
+                <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.PHOTO -->
+                <i class="fas fa-image fa-lg"></i>
+                <!-- /ko -->
+                <!-- ko if: $root._determineItemType($data['class']) == $root.ITEM_TYPES.UNKNOWN -->
+                <i class="fas fa-question-circle fa-lg"></i>
+                <!-- /ko -->
+              </span>
+              <span class="folderItemTitle" data-bind="text: title"></span>
+              <span class="ml-auto">
+                <!-- ko if: $root.canPlay($data) -->
+                <button type="button" class="btn btn-default"
+                  data-bind="click: $root.addEntityToPlaylist, clickBubble: false">
+                  <i class="fas fa-stream"></i>
+                </button>
+                <button type="button" class="btn btn-default"
+                  data-bind="click: $root.addEntityToPlaylist, clickBubble: false">
+                  <i class="fas fa-play"></i>
+                </button>
+                <!-- /ko -->
+              </span>
+            </div>
             <!-- /ko -->
-          </div>
-          <!-- /ko -->
 
-          <div class="col-md-2 d-none d-md-block bg-light sidebar">
-            <div class="sidebar-stick">
-              <!-- ko if: focusItem -->
-              <h4>TRACK INFO</h4>
-              <div id="track-info" data-bind="with: focusItem">
-                <p data-bind="text: title"></p>
-              </div>
+          </div>
+
+          <!-- ko if: focusItem -->
+          <div class="col-4 track-info">
+            <h4>TRACK INFO</h4>
+            <span class="clickable float-right" data-bind="click: $root.closeTrackInfo"><i
+                class="fas fa-times fa-lg"></i></span>
+            <div data-bind="with: focusItem">
+              <!-- ko if: $data.title -->
+              <h2 data-bind="text: title"></h2>
+              <!-- /ko -->
+              <!-- ko if: $data.artist -->
+              <h3 data-bind="text: artist"></h3>
+              <!-- /ko -->
+              <!-- ko if: $data.album -->
+              <h3 data-bind="text: album"></h3>
+              <!-- /ko -->
+              <!-- ko if: $data.originalTrackNumber -->
+              <p data-bind="text: originalTrackNumber"></p>
+              <!-- /ko -->
+              <!-- ko if: $data.duration -->
+              <p data-bind="text: duration"></p>
+              <!-- /ko -->
+              <!-- ko if: $data.bitrate -->
+              <p data-bind="text: bitrate"></p>
+              <!-- /ko -->
+              <!-- ko if: $data.res -->
+              <p data-bind="text: res"></p>
+              <!-- /ko -->
+              <!-- ko if: $data.sampleFrequency -->
+              <p data-bind="text: sampleFrequency"></p>
+              <!-- /ko -->
+              <!-- ko if: $data.size -->
+              <p data-bind="text: size"></p>
+              <!-- /ko -->
+              <!-- ko if: $data.genre -->
+              <p data-bind="text: genre"></p>
+              <!-- /ko -->
+              <!-- ko if: $data.creator -->
+              <p data-bind="text: creator"></p>
               <!-- /ko -->
             </div>
           </div>
+          <!-- /ko -->
         </div>
       </div>
 
@@ -106,8 +141,8 @@
         </button>
 
         <div data-bind="foreach: playlist" class="list-group dragSortable">
-          <div class="list-group-item d-flex justify-content-between align-items-center folderItemCell dragItem" draggable="true"
-          data-bind="event:{ dragover: $root.dragOver,
+          <div class="list-group-item d-flex justify-content-between align-items-center folderItemCell dragItem"
+            draggable="true" data-bind="event:{ dragover: $root.dragOver,
                           dragenter: $root.dragEnter,
                           dragleave: $root.dragLeave,
                           drop: $root.dragDrop,

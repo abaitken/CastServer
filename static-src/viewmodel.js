@@ -196,6 +196,10 @@ function ViewModel() {
     }
   };
 
+  self.closeTrackInfo = function () {
+    self.focusItem(false);
+  };
+
   self.get_currentContainerId = function () {
     if (window.location.hash.length <= 1)
       return '0';
