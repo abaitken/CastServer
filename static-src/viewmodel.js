@@ -44,7 +44,6 @@ function ViewModel() {
   }
 
   /* BEGIN PLAYLIST Fns */
-
   self.addEntityToPlaylist = function (item) {
     self._serviceRequest('playlist', ['add', item['id']])
       .done(function (data) {
@@ -78,7 +77,7 @@ function ViewModel() {
 
     self._serviceRequest('playlist', ['remove', item['id']])
       .done(function (data) {
-        self._removePlaylistItemImpl(item['id']);
+        // NOTE : Socket message will come back to indicate that a playlist item was added
       })
       .fail(function (jqXHR, textStatus, errorThrown) {
         self.messages(errorThrown);
@@ -90,9 +89,14 @@ function ViewModel() {
   };
 
   self.clearPlaylist = function () {
+    if (self.playlist().length === 0)
+      return;
+
+    if (!confirm("Remove all items from the playlist?"))
+      return;
     self._serviceRequest('playlist', 'clear')
       .done(function (data) {
-        self.playlist([]);
+        // NOTE : Socket message will come back to indicate that a playlist item was added
       })
       .fail(function (jqXHR, textStatus, errorThrown) {
         self.messages(errorThrown);
@@ -241,9 +245,91 @@ function ViewModel() {
     }
   };
 
+  /* DRAG DROP Fns */
+  self.dragItem = {};
 
-  /* INIT */
-  self.socketConnect = function(){
+  self.notifyPlaylistPosition = function (id, index) {
+    self._serviceRequest('playlist', ['move', id, 'to', index])
+      .done(function (data) {
+        // NOTE : Socket message will come back to indicate that a playlist item was added
+      })
+      .fail(function (jqXHR, textStatus, errorThrown) {
+        self.messages(errorThrown);
+        $("#messages").attr("class", "alert alert-danger");
+        // TODO : Text not displaying correctly
+        $("#track-info").html("Error: " + errorThrown);
+      });
+  };
+
+  self.dragOver = function (item, e) {
+    if (e.preventDefault) {
+      e.preventDefault();
+    }
+
+    e.target.classList.remove('insertAbove');
+    e.target.classList.remove('insertBelow');
+
+    var yPosition = e.clientY - e.target.getBoundingClientRect().top;
+    var isAbove = yPosition <= (e.target.getBoundingClientRect().height / 2);
+    if (isAbove) {
+      e.target.classList.add('insertAbove');
+    }
+    else {
+      e.target.classList.add('insertBelow');
+    }
+
+    e.dataTransfer.dropEffect = 'move';
+
+    return true;
+  };
+
+  self.dragEnter = function (item, e) {
+    return true;
+  };
+
+  self.dragLeave = function (item, e) {
+    e.target.classList.remove('insertAbove');
+    e.target.classList.remove('insertBelow');
+    return true;
+  };
+
+  self.dragDrop = function (item, e) {
+    if (e.stopPropagation) {
+      e.stopPropagation();
+    }
+    if (self.dragItem !== item) {
+      var newIndex = self.playlist.indexOf(item);
+
+      var yPosition = e.clientY - e.target.getBoundingClientRect().top;
+      var isAbove = yPosition <= (e.target.getBoundingClientRect().height / 2);
+      if (!isAbove)
+        newIndex++;
+
+      self.notifyPlaylistPosition(self.dragItem['id'], newIndex);
+    }
+    e.target.classList.remove('insertAbove');
+    e.target.classList.remove('insertBelow');
+    self.dragItem = {};
+    return true;
+  };
+
+  self.dragStart = function (item, e) {
+    self.dragItem = item;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.target.outerHTML);
+    e.target.classList.add('dragging');
+    return true;
+  };
+
+  self.dragEnd = function (item, e) {
+    e.target.classList.remove('insertAbove');
+    e.target.classList.remove('insertBelow');
+    e.target.classList.remove('dragging');
+    return true;
+  };
+
+  /* Websockets */
+  self.socketConnect = function () {
     var socketUrl = '';
     if (window.location.protocol === "https:") {
       socketUrl = "wss:";
@@ -259,8 +345,8 @@ function ViewModel() {
     // TODO : PING/PONG to prevent timeouts?
     self.webSocket = new WebSocket(socketUrl);
 
-    self.webSocket.onclose = function(event) {
-      setTimeout(function(){self.socketConnect();}, 1000);      
+    self.webSocket.onclose = function (event) {
+      setTimeout(function () { self.socketConnect(); }, 1000);
     };
 
     self.webSocket.onmessage = async function (event) {
@@ -297,6 +383,17 @@ function ViewModel() {
             case 'clear':
               self.playlist([]);
               break;
+            case 'move':
+              var originalIndex = self.indexOfArrayEx(self.playlist(), 'id', data['id']);
+
+              if (originalIndex !== -1) {
+                var item = self.playlist()[originalIndex];
+                var newIndex = data['index'];
+                self.playlist.splice(originalIndex, 1);
+                self.playlist.splice(newIndex, 0, item);
+              }
+
+              break;
             default:
               console.log("Unexpected action: " + data['action']);
               break;
@@ -310,7 +407,8 @@ function ViewModel() {
 
   };
 
-  self._focusContainer = function(containerPrefix){
+  /* Page/Navigation */
+  self._focusContainer = function (containerPrefix) {
     const selectedClass = 'active';
     $('.viewCommand').removeClass(selectedClass);
     $('.viewContainer').hide();
@@ -319,14 +417,15 @@ function ViewModel() {
     $('#' + containerPrefix + 'Container').show();
   };
 
-  self.browseCommand = function(){
+  self.browseCommand = function () {
     self._focusContainer('browse');
   };
 
-  self.playlistCommand = function(){
+  self.playlistCommand = function () {
     self._focusContainer('playlist');
   };
 
+  /* INIT */
   self.Init = function () {
     ko.applyBindings(self);
 
@@ -345,8 +444,8 @@ function ViewModel() {
     self.updatePlaylist();
 
     self.socketConnect();
-    
   };
+
 
 }
 

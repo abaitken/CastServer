@@ -2,6 +2,32 @@
 @import "~bootstrap/scss/bootstrap";
 @import "~bootswatch/dist/sandstone/bootswatch";
 
+[draggable] {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* Required to make elements draggable in old WebKit */
+  -khtml-user-drag: element;
+  -webkit-user-drag: element;
+}
+
+.dragItem {
+  cursor: move;
+}
+
+.dragItem.dragging {
+  opacity: 0.5;
+}
+
+.dragItem.insertAbove {
+  border-top: 2px solid theme-color("dark");
+}
+
+.dragItem.insertBelow {
+  border-bottom: 2px solid theme-color("dark");
+}
+
 .clickable {
   cursor: pointer;
 }
