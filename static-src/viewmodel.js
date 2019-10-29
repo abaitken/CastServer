@@ -44,7 +44,6 @@ function ViewModel() {
   }
 
   /* BEGIN PLAYLIST Fns */
-
   self.addEntityToPlaylist = function (item) {
     self._serviceRequest('playlist', ['add', item['id']])
       .done(function (data) {
@@ -78,7 +77,7 @@ function ViewModel() {
 
     self._serviceRequest('playlist', ['remove', item['id']])
       .done(function (data) {
-        self._removePlaylistItemImpl(item['id']);
+        // NOTE : Socket message will come back to indicate that a playlist item was added
       })
       .fail(function (jqXHR, textStatus, errorThrown) {
         self.messages(errorThrown);
@@ -97,7 +96,7 @@ function ViewModel() {
       return;
     self._serviceRequest('playlist', 'clear')
       .done(function (data) {
-        self.playlist([]);
+        // NOTE : Socket message will come back to indicate that a playlist item was added
       })
       .fail(function (jqXHR, textStatus, errorThrown) {
         self.messages(errorThrown);
@@ -246,8 +245,85 @@ function ViewModel() {
     }
   };
 
+  /* DRAG DROP Fns */
+  self.dragItem = {};
 
-  /* INIT */
+  self.notifyPlaylistPosition = function (id, index) {
+    self._serviceRequest('playlist', ['move', id, 'to', index])
+      .done(function (data) {
+        // NOTE : Socket message will come back to indicate that a playlist item was added
+      })
+      .fail(function (jqXHR, textStatus, errorThrown) {
+        self.messages(errorThrown);
+        $("#messages").attr("class", "alert alert-danger");
+        // TODO : Text not displaying correctly
+        $("#track-info").html("Error: " + errorThrown);
+      });
+  };
+
+  self.dragOver = function (item, e) {
+    if (e.preventDefault) {
+      e.preventDefault();
+    }
+
+    e.target.classList.remove('overAbove');
+    e.target.classList.remove('overBelow');
+
+
+    var yPosition = e.clientY - e.target.getBoundingClientRect().top;
+    var isAbove = yPosition <= (e.target.getBoundingClientRect().height / 2);
+    if (isAbove) {
+      e.target.classList.add('overAbove');
+    }
+    else {
+      e.target.classList.add('overBelow');
+    }
+
+    e.dataTransfer.dropEffect = 'move';
+
+    return true;
+  };
+
+  self.dragEnter = function (item, e) {
+    return true;
+  };
+
+  self.dragLeave = function (item, e) {
+    e.target.classList.remove('overAbove');
+    e.target.classList.remove('overBelow');
+    return true;
+  };
+
+  self.dragDrop = function (item, e) {
+    if (e.stopPropagation) {
+      e.stopPropagation();
+    }
+    if (self.dragItem !== item) {
+      var newIndex = self.playlist.indexOf(item);
+      self.notifyPlaylistPosition(self.dragItem['id'], newIndex);
+    }
+    e.target.classList.remove('overAbove');
+    e.target.classList.remove('overBelow');
+    self.dragItem = {};
+    return true;
+  };
+
+  self.dragStart = function (item, e) {
+    self.dragItem = item;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.target.outerHTML);
+    e.target.classList.add('dragElem');
+    return true;
+  };
+
+  self.dragEnd = function (item, e) {
+    e.target.classList.remove('overAbove');
+    e.target.classList.remove('overBelow');
+    e.target.classList.remove('dragElem');
+    return true;
+  };
+
+  /* Websockets */
   self.socketConnect = function () {
     var socketUrl = '';
     if (window.location.protocol === "https:") {
@@ -302,6 +378,17 @@ function ViewModel() {
             case 'clear':
               self.playlist([]);
               break;
+            case 'move':
+              var originalIndex = self.indexOfArrayEx(self.playlist(), 'id', data['id']);
+
+              if (originalIndex !== -1) {
+                var item = self.playlist()[originalIndex];
+                var newIndex = data['index'];
+                self.playlist.splice(originalIndex, 1);
+                self.playlist.splice(newIndex, 0, item);
+              }
+
+              break;
             default:
               console.log("Unexpected action: " + data['action']);
               break;
@@ -315,6 +402,7 @@ function ViewModel() {
 
   };
 
+  /* Page/Navigation */
   self._focusContainer = function (containerPrefix) {
     const selectedClass = 'active';
     $('.viewCommand').removeClass(selectedClass);
@@ -332,6 +420,7 @@ function ViewModel() {
     self._focusContainer('playlist');
   };
 
+  /* INIT */
   self.Init = function () {
     ko.applyBindings(self);
 
@@ -350,81 +439,6 @@ function ViewModel() {
     self.updatePlaylist();
 
     self.socketConnect();
-
-  };
-
-
-
-  self.dragOver = function (item, e) {
-    if (e.preventDefault) {
-      e.preventDefault();
-    }
-    
-    e.target.classList.remove('overAbove');
-    e.target.classList.remove('overBelow');
-
-    
-    var yPosition = e.clientY - e.target.getBoundingClientRect().top;
-    var isAbove = yPosition <= (e.target.getBoundingClientRect().height / 2);
-    if(isAbove)
-    {
-      e.target.classList.add('overAbove');
-    }
-    else
-    {
-      e.target.classList.add('overBelow');
-    }
-
-    e.dataTransfer.dropEffect = 'move';
-
-    return true;
-  };
-
-  self.dragEnter = function (item, e) {
-    return true;
-  };
-
-  self.dragLeave = function (item, e) {
-    e.target.classList.remove('overAbove');
-    e.target.classList.remove('overBelow');
-    return true;
-  };
-
-  self.dragDrop = function (item, e) {
-    if (e.stopPropagation) {
-      e.stopPropagation();
-    }
-    if(self.dragItem !== item){
-      var originalIndex = self.playlist.indexOf(self.dragItem);
-      var newIndex = self.playlist.indexOf(item);
-
-      if(originalIndex !== -1 && newIndex !== -1)
-      {
-        self.playlist.splice(originalIndex, 1);
-        self.playlist.splice(newIndex, 0, self.dragItem);
-      }
-    }
-    e.target.classList.remove('overAbove');
-    e.target.classList.remove('overBelow');
-    self.dragItem = {};
-    return true;
-  };
-
-  self.dragItem = {};
-
-  self.dragStart = function (item, e) {
-    self.dragItem = item;
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', e.target.outerHTML);
-    e.target.classList.add('dragElem');
-    return true;
-  };
-
-  self.dragEnd = function (item, e) {
-    e.target.classList.remove('overAbove');
-    e.target.classList.remove('overBelow');
-    e.target.classList.remove('dragElem');
-    return true;
   };
 
 
