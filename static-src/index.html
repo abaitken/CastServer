@@ -25,6 +25,9 @@
         <li class="nav-item viewCommand clickable" id="playlistCommand" data-bind="click: $root.playlistCommand">
           <a class="nav-link" href="#"><i class="fas fa-list fa-lg"></i> PLAYLIST</a>
         </li>
+        <li class="nav-item viewCommand clickable" id="nowPlayingCommand" data-bind="click: $root.nowPlayingCommand">
+          <a class="nav-link" href="#"><i class="fas fa-music fa-lg"></i> NOW PLAYING</a>
+        </li>
       </ul>
     </div>
   </nav>
@@ -156,6 +159,16 @@
               </button>
             </span>
           </div>
+        </div>
+      </div>
+
+      <div class="col viewContainer" id="nowPlayingContainer">
+        <div class="playControls">
+          <i class="fas fa-step-backward fa-lg"></i>
+          <i class="fas fa-undo-alt fa-lg"></i>
+          <i class="fas fa-play fa-lg"></i>
+          <i class="fas fa-pause fa-lg"></i>
+          <i class="fas fa-step-forward fa-lg"></i>
         </div>
       </div>
     </div>

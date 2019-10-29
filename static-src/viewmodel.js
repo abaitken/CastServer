@@ -429,6 +429,10 @@ function ViewModel() {
     self._focusContainer('playlist');
   };
 
+  self.nowPlayingCommand = function () {
+    self._focusContainer('nowPlaying');
+  };
+
   /* INIT */
   self.Init = function () {
     ko.applyBindings(self);
