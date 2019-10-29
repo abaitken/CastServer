@@ -356,44 +356,75 @@ function ViewModel() {
 
 
   self.dragOver = function (item, e) {
-    console.log('dragOver');
     if (e.preventDefault) {
-      e.preventDefault(); // Necessary. Allows us to drop.
+      e.preventDefault();
     }
-    e.target.classList.add('over');
+    
+    e.target.classList.remove('overAbove');
+    e.target.classList.remove('overBelow');
 
-    e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+    
+    var yPosition = e.clientY - e.target.getBoundingClientRect().top;
+    var isAbove = yPosition <= (e.target.getBoundingClientRect().height / 2);
+    if(isAbove)
+    {
+      e.target.classList.add('overAbove');
+    }
+    else
+    {
+      e.target.classList.add('overBelow');
+    }
 
-    return false;
+    e.dataTransfer.dropEffect = 'move';
+
+    return true;
   };
 
   self.dragEnter = function (item, e) {
-    console.log('dragEnter');
+    return true;
   };
 
   self.dragLeave = function (item, e) {
-    console.log('dragLeave');
-    //this.classList.remove('over');  // this / e.target is previous target element.
+    e.target.classList.remove('overAbove');
+    e.target.classList.remove('overBelow');
+    return true;
   };
 
   self.dragDrop = function (item, e) {
-    console.log('dragDrop');
     if (e.stopPropagation) {
-      e.stopPropagation(); // Stops some browsers from redirecting.
+      e.stopPropagation();
     }
+    if(self.dragItem !== item){
+      var originalIndex = self.playlist.indexOf(self.dragItem);
+      var newIndex = self.playlist.indexOf(item);
+
+      if(originalIndex !== -1 && newIndex !== -1)
+      {
+        self.playlist.splice(originalIndex, 1);
+        self.playlist.splice(newIndex, 0, self.dragItem);
+      }
+    }
+    e.target.classList.remove('overAbove');
+    e.target.classList.remove('overBelow');
+    self.dragItem = {};
+    return true;
   };
 
-  self.dragStart = function (item, e) {
-    console.log('dragStart');
+  self.dragItem = {};
 
+  self.dragStart = function (item, e) {
+    self.dragItem = item;
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/html', e.target.outerHTML);
     e.target.classList.add('dragElem');
+    return true;
   };
 
   self.dragEnd = function (item, e) {
-    console.log('dragEnd');
-    e.target.classList.remove('over');
+    e.target.classList.remove('overAbove');
+    e.target.classList.remove('overBelow');
+    e.target.classList.remove('dragElem');
+    return true;
   };
 
 
