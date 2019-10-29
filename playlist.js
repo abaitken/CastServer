@@ -20,7 +20,6 @@ class Playlist {
   RemoveIndex(index) {
     if (index === -1)
       return false;
-    console.log('item removed');
     this.Items.splice(index, 1);
     return true;
   }
@@ -47,7 +46,6 @@ class Playlist {
     var item = this.Items[oldIndex];
     this.Items.splice(oldIndex, 1);
     this.Items.splice(newIndex, 0, item);
-    console.log('item moved');
     return true;
   }
 
@@ -69,7 +67,6 @@ class Playlist {
 
   Clear() {
     this.Items = [];
-    console.log('items cleared');
   }
 }
 
