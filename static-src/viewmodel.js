@@ -266,17 +266,16 @@ function ViewModel() {
       e.preventDefault();
     }
 
-    e.target.classList.remove('overAbove');
-    e.target.classList.remove('overBelow');
-
+    e.target.classList.remove('insertAbove');
+    e.target.classList.remove('insertBelow');
 
     var yPosition = e.clientY - e.target.getBoundingClientRect().top;
     var isAbove = yPosition <= (e.target.getBoundingClientRect().height / 2);
     if (isAbove) {
-      e.target.classList.add('overAbove');
+      e.target.classList.add('insertAbove');
     }
     else {
-      e.target.classList.add('overBelow');
+      e.target.classList.add('insertBelow');
     }
 
     e.dataTransfer.dropEffect = 'move';
@@ -289,8 +288,8 @@ function ViewModel() {
   };
 
   self.dragLeave = function (item, e) {
-    e.target.classList.remove('overAbove');
-    e.target.classList.remove('overBelow');
+    e.target.classList.remove('insertAbove');
+    e.target.classList.remove('insertBelow');
     return true;
   };
 
@@ -300,10 +299,16 @@ function ViewModel() {
     }
     if (self.dragItem !== item) {
       var newIndex = self.playlist.indexOf(item);
+
+      var yPosition = e.clientY - e.target.getBoundingClientRect().top;
+      var isAbove = yPosition <= (e.target.getBoundingClientRect().height / 2);
+      if (!isAbove)
+        newIndex++;
+
       self.notifyPlaylistPosition(self.dragItem['id'], newIndex);
     }
-    e.target.classList.remove('overAbove');
-    e.target.classList.remove('overBelow');
+    e.target.classList.remove('insertAbove');
+    e.target.classList.remove('insertBelow');
     self.dragItem = {};
     return true;
   };
@@ -312,14 +317,14 @@ function ViewModel() {
     self.dragItem = item;
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/html', e.target.outerHTML);
-    e.target.classList.add('dragElem');
+    e.target.classList.add('dragging');
     return true;
   };
 
   self.dragEnd = function (item, e) {
-    e.target.classList.remove('overAbove');
-    e.target.classList.remove('overBelow');
-    e.target.classList.remove('dragElem');
+    e.target.classList.remove('insertAbove');
+    e.target.classList.remove('insertBelow');
+    e.target.classList.remove('dragging');
     return true;
   };
 

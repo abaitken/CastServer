@@ -16,15 +16,15 @@
   cursor: move;
 }
 
-.dragItem.dragElem {
-  opacity: 0.4;
+.dragItem.dragging {
+  opacity: 0.5;
 }
 
-.dragItem.overAbove {
+.dragItem.insertAbove {
   border-top: 2px solid theme-color("dark");
 }
 
-.dragItem.overBelow {
+.dragItem.insertBelow {
   border-bottom: 2px solid theme-color("dark");
 }
 
