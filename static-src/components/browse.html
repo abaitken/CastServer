@@ -34,11 +34,11 @@
             <span class="ml-auto">
                 <!-- ko if: $parent.canPlay($data) -->
                 <button type="button" class="btn btn-default"
-                    data-bind="click: $root.addEntityToPlaylist, clickBubble: false">
+                    data-bind="click: $parent.addEntityToPlaylist, clickBubble: false">
                     <i class="fas fa-stream"></i>
                 </button>
                 <button type="button" class="btn btn-default"
-                    data-bind="click: $root.addEntityToPlaylist, clickBubble: false">
+                    data-bind="click: $parent.addEntityToPlaylist, clickBubble: false">
                     <i class="fas fa-play"></i>
                 </button>
                 <!-- /ko -->

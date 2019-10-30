@@ -13,31 +13,13 @@ module.exports = function (ko, $) {
             var self = this;
             self.ITEM_TYPES = ITEM_TYPES;
 
-            /* COMMON */
-            self._serviceRequest = function (action, urlArgs) {
-                var url = "/" + action;
-                if (Array.isArray(urlArgs)) {
-                    for (let index = 0; index < urlArgs.length; index++) {
-                        const item = urlArgs[index];
-
-                        url = url + "/" + item;
-                    }
-                }
-                else if (urlArgs) {
-                    url = url + "/" + urlArgs;
-                }
-
-                return $.ajax({
-                    type: "GET",
-                    url: url,
-                    dataType: "json",
-                    mimeType: "application/json"
-                });
-            }
-
             self.folderData = ko.observableArray();
             self.breadcrumb = ko.observableArray();
             self.focusItem = ko.observable(false);
+
+            self.addEntityToPlaylist = function (item) {
+                root.playlistViewModel.addEntityToPlaylist(item);
+            };
 
             self.breadcrumbJump = function (item) {
                 self.set_currentContainerId(item['id']);
@@ -45,7 +27,7 @@ module.exports = function (ko, $) {
 
             self.requestData = function (id, page) {
 
-                self._serviceRequest('browse', [id, page])
+                root._serviceRequest('browse', [id, page])
                     .done(function (data) {
                         for (var i = 0; i < data.items.length; i++) {
                             self.folderData.push(data.items[i]);
@@ -141,7 +123,7 @@ module.exports = function (ko, $) {
 
                     var currentId = self.get_currentContainerId();
                     while (currentId != '-1') {
-                        await self._serviceRequest('info', currentId)
+                        await root._serviceRequest('info', currentId)
                             .done(function (data) {
                                 newBreadcrumb.splice(0, 0, data);
                                 currentId = data['parentID'];
