@@ -26,5 +26,9 @@
     "unescape": "^1.0.1",
     "ws": "^7.2.0",
     "xml2js": "^0.4.22"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^5.0.4",
+    "html-loader": "^0.5.5"
   }
 }
