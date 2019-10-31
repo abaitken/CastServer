@@ -11,7 +11,7 @@ var notifications = require('./notifications.js');
 var notifier = new notifications.Notifier(server);
 
 require("./browse")(app, config);
-require("./cast")(app, config);
+require("./cast")(app, notifier, config);
 require("./playlist")(app, notifier, config);
 
 server.listen(config.server.listenPort, () => {

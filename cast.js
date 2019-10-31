@@ -37,7 +37,7 @@ function GetChromecastStatus(host, callback) {
   });
 }
 
-module.exports = function(app, config) {
+module.exports = function(app, notifier, config) {
   app.get("/cast/status", (req, res, next) => {
     // TODO : Resolve this hard coded device!
     var host = config.devices[0]['address'];
@@ -47,23 +47,81 @@ module.exports = function(app, config) {
   });
 
   app.get("/cast/pause", (req, res, next) => {
-    res.json({"result": "NotImplemented"});
+    // TODO : Implement
+    res.json("OK");
+    notifier.NotifyClients({ "category": "cast", "action": "pause" });
   });
 
   app.get("/cast/play", (req, res, next) => {
-    res.json({"result": "NotImplemented"});
+    // TODO : Implement
+    res.json("OK");
+    notifier.NotifyClients({ "category": "cast", "action": "play" });
   });
 
   app.get("/cast/stop", (req, res, next) => {
-    res.json({"result": "NotImplemented"});
+    // TODO : Implement
+    res.json("OK");
+    notifier.NotifyClients({ "category": "cast", "action": "stop" });
   });
 
   app.get("/cast/disconnect", (req, res, next) => {
-    res.json({"result": "NotImplemented"});
+    // TODO : Implement
+    res.json("OK");
+    notifier.NotifyClients({ "category": "cast", "action": "disconnect" });
   });
 
   app.get("/cast/connect", (req, res, next) => {
-    res.json({"result": "NotImplemented"});
+    // TODO : Implement
+    res.json("OK");
+    notifier.NotifyClients({ "category": "cast", "action": "connect" });
+  });
+
+  app.get("/cast/next", (req, res, next) => {
+    // TODO : Implement
+    res.json("OK");
+    notifier.NotifyClients({ "category": "cast", "action": "next" });
+  });
+
+  app.get("/cast/previous", (req, res, next) => {
+    // TODO : Implement
+    res.json("OK");
+    notifier.NotifyClients({ "category": "cast", "action": "previous" });
+  });
+
+  app.get("/cast/rewind", (req, res, next) => {
+    // TODO : Implement
+    res.json("OK");
+    notifier.NotifyClients({ "category": "cast", "action": "rewind" });
+  });
+
+  app.get("/cast/seekahead", (req, res, next) => {
+    // TODO : Implement
+    res.json("OK");
+    notifier.NotifyClients({ "category": "cast", "action": "seekahead" });
+  });
+
+  app.get("/cast/mute", (req, res, next) => {
+    // TODO : Implement
+    res.json("OK");
+    notifier.NotifyClients({ "category": "cast", "action": "mute" });
+  });
+
+  app.get("/cast/unmute", (req, res, next) => {
+    // TODO : Implement
+    res.json("OK");
+    notifier.NotifyClients({ "category": "cast", "action": "unmute" });
+  });
+
+  app.get("/cast/repeat", (req, res, next) => {
+    // TODO : Implement
+    res.json("OK");
+    notifier.NotifyClients({ "category": "cast", "action": "repeat" });
+  });
+
+  app.get("/cast/shuffle", (req, res, next) => {
+    // TODO : Implement
+    res.json("OK");
+    notifier.NotifyClients({ "category": "cast", "action": "shuffle" });
   });
     
 };
