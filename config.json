@@ -13,6 +13,11 @@
             "type": "chromecast",
             "id": "Lounge",
             "address": "192.168.1.4"
+        },
+        {
+            "type": "chromecast",
+            "id": "Office",
+            "address": "192.168.1.18"
         }
     ]
 }
