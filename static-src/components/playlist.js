@@ -7,24 +7,6 @@ module.exports = function (ko, $) {
 
             self.playlist = ko.observableArray();
 
-            /* BEGIN PLAYLIST Fns */
-            self.addEntityToPlaylist = function (item) {
-                root._serviceRequest('playlist', ['add', item['id']])
-                    .done(function (data) {
-                        // NOTE : Socket message will come back to indicate that a playlist item was added
-                    })
-                    .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
-                    });
-            };
-
-            self.addEntityToPlaylistImpl = function (item) {
-                self.playlist.push(item);
-            };
-
             self._removePlaylistItemImpl = function (id) {
                 var itemIndex = root.indexOfArrayEx(self.playlist(), 'id', id);
                 if (itemIndex !== -1)
@@ -44,10 +26,6 @@ module.exports = function (ko, $) {
                         $("#track-info").html("Error: " + errorThrown);
                     });
 
-            };
-
-            self.clearPlaylistImpl = function () {
-                self.playlist([]);
             };
 
             self.clearPlaylist = function () {
@@ -176,21 +154,44 @@ module.exports = function (ko, $) {
             };
 
             self.onRoutedEvent = function (eventName, args) {
-                switch (eventName) {
-                    case 'addEntityToPlaylist':
-                        self.addEntityToPlaylist(args);
+
+                if (eventName !== 'socketmessage')
+                    return;
+
+                var data = args;
+
+                if (data['category'] !== 'playlist')
+                    return;
+
+                if (!data['action']) {
+                    console.log("No action for playlist category");
+                    return;
+                }
+
+                switch (data['action']) {
+                    case 'add':
+                        root._serviceRequest('info', data['id'])
+                            .done(function (data) {
+                                self.playlist.push(data);
+                            })
+                            .fail(function (jqXHR, textStatus, errorThrown) {
+                                root.messages(errorThrown);
+                                $("#messages").attr("class", "alert alert-danger");
+                                // TODO : Text not displaying correctly
+                                $("#track-info").html("Error: " + errorThrown);
+                            });
                         break;
-                    case 'addEntityToPlaylistImpl':
-                        self.addEntityToPlaylistImpl(args);
+                    case 'remove':
+                        self._removePlaylistItemImpl(data['id']);
                         break;
-                    case '_removePlaylistItemImpl':
-                        self._removePlaylistItemImpl(args);
+                    case 'clear':
+                        self.playlist([]);
                         break;
-                    case 'clearPlaylistImpl':
-                        self.clearPlaylistImpl();
+                    case 'move':
+                        self.moveImpl(data['id'], data['index']);
                         break;
-                    case 'moveImpl':
-                        self.moveImpl(args['id'], args['index']);
+                    default:
+                        console.log("Unexpected action: " + data['action']);
                         break;
                 }
             };

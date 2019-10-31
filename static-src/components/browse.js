@@ -18,7 +18,16 @@ module.exports = function (ko, $) {
             self.focusItem = ko.observable(false);
 
             self.addEntityToPlaylist = function (item) {
-                root.eventRouter.raise('addEntityToPlaylist', item);
+                root._serviceRequest('playlist', ['add', item['id']])
+                    .done(function (data) {
+                        // NOTE : Socket message will come back to indicate that a playlist item was added
+                    })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        root.messages(errorThrown);
+                        $("#messages").attr("class", "alert alert-danger");
+                        // TODO : Text not displaying correctly
+                        $("#track-info").html("Error: " + errorThrown);
+                    });
             };
 
             self.breadcrumbJump = function (item) {

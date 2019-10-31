@@ -96,44 +96,7 @@ function ViewModel() {
         return;
       }
 
-      switch (data['category']) {
-        case 'playlist':
-          if (!data['action']) {
-            console.log("No action for playlist category");
-            return;
-          }
-
-          switch (data['action']) {
-            case 'add':
-              await self._serviceRequest('info', data['id'])
-                .done(function (data) {
-                  self.eventRouter.raise('addEntityToPlaylistImpl', data);
-                })
-                .fail(function (jqXHR, textStatus, errorThrown) {
-                  self.messages(errorThrown);
-                  $("#messages").attr("class", "alert alert-danger");
-                  // TODO : Text not displaying correctly
-                  $("#track-info").html("Error: " + errorThrown);
-                });
-              break;
-            case 'remove':
-              self.eventRouter.raise('_removePlaylistItemImpl', data['id']);
-              break;
-            case 'clear':
-              self.eventRouter.raise('clearPlaylistImpl');
-              break;
-            case 'move':
-              self.eventRouter.raise('moveImpl', data);
-              break;
-            default:
-              console.log("Unexpected action: " + data['action']);
-              break;
-          }
-          break;
-        default:
-          console.log("Unexpected category: " + data['category']);
-          break;
-      }
+      self.eventRouter.raise('socketmessage', data);
     };
 
   };
