@@ -1,0 +1,93 @@
+<h2>BROWSE</h2>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb" data-bind="foreach: breadcrumb">
+        <!-- ko if: ($index() !== ($parent.breadcrumb().length - 1)) -->
+        <li class="breadcrumb-item"><a href="#" data-bind="text: title, click: $parent.breadcrumbJump"></a></li>
+        <!-- /ko -->
+
+        <!-- ko if: ($index() === ($parent.breadcrumb().length - 1)) -->
+        <li class="breadcrumb-item active" aria-current="page" data-bind="text: title"></li>
+        <!-- /ko -->
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col list-group overflow-auto folderItemsRegion">
+        <!-- ko foreach: folderData -->
+        <div class="list-group-item d-flex justify-content-between clickable folderItemCell"
+            data-bind="click: $parent.itemClicked, clickBubble: false">
+            <span class="folderItemIcon">
+                <!-- ko if: $parent._determineItemType($data['class']) == $parent.ITEM_TYPES.CONTAINER -->
+                <i class="fas fa-folder fa-lg"></i>
+                <!-- /ko -->
+                <!-- ko if: $parent._determineItemType($data['class']) == $parent.ITEM_TYPES.MUSIC -->
+                <i class="fas fa-music fa-lg"></i>
+                <!-- /ko -->
+                <!-- ko if: $parent._determineItemType($data['class']) == $parent.ITEM_TYPES.PHOTO -->
+                <i class="fas fa-image fa-lg"></i>
+                <!-- /ko -->
+                <!-- ko if: $parent._determineItemType($data['class']) == $parent.ITEM_TYPES.UNKNOWN -->
+                <i class="fas fa-question-circle fa-lg"></i>
+                <!-- /ko -->
+            </span>
+            <span class="folderItemTitle" data-bind="text: title"></span>
+            <span class="ml-auto">
+                <!-- ko if: $parent.canPlay($data) -->
+                <button type="button" class="btn btn-default"
+                    data-bind="click: $parent.addEntityToPlaylist, clickBubble: false">
+                    <i class="fas fa-stream"></i>
+                </button>
+                <button type="button" class="btn btn-default"
+                    data-bind="click: $parent.addEntityToPlaylist, clickBubble: false">
+                    <i class="fas fa-play"></i>
+                </button>
+                <!-- /ko -->
+            </span>
+        </div>
+        <!-- /ko -->
+
+    </div>
+
+    <!-- ko if: focusItem -->
+    <div class="col-4 track-info">
+        <h4>TRACK INFO</h4>
+        <span class="clickable float-right" data-bind="click: closeTrackInfo"><i
+                class="fas fa-times fa-lg"></i></span>
+        <div data-bind="with: focusItem">
+            <!-- ko if: $data.title -->
+            <h2 data-bind="text: title"></h2>
+            <!-- /ko -->
+            <!-- ko if: $data.artist -->
+            <h3 data-bind="text: artist"></h3>
+            <!-- /ko -->
+            <!-- ko if: $data.album -->
+            <h3 data-bind="text: album"></h3>
+            <!-- /ko -->
+            <!-- ko if: $data.originalTrackNumber -->
+            <p data-bind="text: originalTrackNumber"></p>
+            <!-- /ko -->
+            <!-- ko if: $data.duration -->
+            <p data-bind="text: duration"></p>
+            <!-- /ko -->
+            <!-- ko if: $data.bitrate -->
+            <p data-bind="text: bitrate"></p>
+            <!-- /ko -->
+            <!-- ko if: $data.res -->
+            <p data-bind="text: res"></p>
+            <!-- /ko -->
+            <!-- ko if: $data.sampleFrequency -->
+            <p data-bind="text: sampleFrequency"></p>
+            <!-- /ko -->
+            <!-- ko if: $data.size -->
+            <p data-bind="text: size"></p>
+            <!-- /ko -->
+            <!-- ko if: $data.genre -->
+            <p data-bind="text: genre"></p>
+            <!-- /ko -->
+            <!-- ko if: $data.creator -->
+            <p data-bind="text: creator"></p>
+            <!-- /ko -->
+        </div>
+    </div>
+    <!-- /ko -->
+</div>
