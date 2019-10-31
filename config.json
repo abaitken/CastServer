@@ -1,6 +1,7 @@
 {
     "server": {
-        "listenPort": 3000
+        "listenPort": 3000,
+        "mode": "console"
     },
     "dlna": {
         "protocol": "http",
