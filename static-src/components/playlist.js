@@ -21,6 +21,10 @@ module.exports = function (ko, $) {
                     });
             };
 
+            self.addEntityToPlaylistImpl = function (item) {
+                self.playlist.push(item);
+            };
+
             self._removePlaylistItemImpl = function (id) {
                 var itemIndex = root.indexOfArrayEx(self.playlist(), 'id', id);
                 if (itemIndex !== -1)
@@ -40,6 +44,10 @@ module.exports = function (ko, $) {
                         $("#track-info").html("Error: " + errorThrown);
                     });
 
+            };
+
+            self.clearPlaylistImpl = function () {
+                self.playlist([]);
             };
 
             self.clearPlaylist = function () {
@@ -74,6 +82,15 @@ module.exports = function (ko, $) {
                     });
             };
 
+            self.moveImpl = function (id, newIndex) {
+                var originalIndex = root.indexOfArrayEx(self.playlist(), 'id', id);
+
+                if (originalIndex !== -1) {
+                    var item = self.playlist()[originalIndex];
+                    self.playlist.splice(originalIndex, 1);
+                    self.playlist.splice(newIndex, 0, item);
+                }
+            };
 
             /* DRAG DROP Fns */
             self.dragItem = {};
@@ -158,7 +175,27 @@ module.exports = function (ko, $) {
                 return true;
             };
 
+            self.onRoutedEvent = function (eventName, args) {
+                switch (eventName) {
+                    case 'addEntityToPlaylist':
+                        self.addEntityToPlaylist(args);
+                        break;
+                    case 'addEntityToPlaylistImpl':
+                        self.addEntityToPlaylistImpl(args);
+                        break;
+                    case '_removePlaylistItemImpl':
+                        self._removePlaylistItemImpl(args);
+                        break;
+                    case 'clearPlaylistImpl':
+                        self.clearPlaylistImpl();
+                        break;
+                    case 'moveImpl':
+                        self.moveImpl(args['id'], args['index']);
+                        break;
+                }
+            };
             self.updatePlaylist();
+            root.eventRouter.subscribe(self.onRoutedEvent);
         },
         template: view
     };

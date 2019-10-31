@@ -15,23 +15,24 @@ ko.components.register("playlist", playlist);
 const nowplaying = require("./components/nowplaying")(ko, $);
 ko.components.register("nowplaying", nowplaying);
 
+function EventRouter() {
+  this.subscribers = [];
+  this.subscribe = function (callback) {
+    this.subscribers.push(callback);
+  };
+  this.raise = function (eventName, args) {
+    for (let index = 0; index < this.subscribers.length; index++) {
+      const subscriber = this.subscribers[index];
+      subscriber(eventName, args);
+    }
+  };
+}
+
 function ViewModel() {
   var self = this;
 
   self.messages = ko.observable("Fetching...");
-  self.playlistViewModel = playlist.viewModel;
-  self.eventRouter = function () {
-    this.subscribers = [];
-    this.subscribe = function (callback) {
-      this.subscribers.push(callback);
-    };
-    this.raise = function (eventName, args) {
-      for (let index = 0; index < this.subscribers.length; index++) {
-        const subscriber = this.subscribers[index];
-        subscriber(eventName, args);
-      }
-    };
-  };
+  self.eventRouter = new EventRouter();
 
   /* COMMON */
   self._serviceRequest = function (action, urlArgs) {
@@ -106,7 +107,7 @@ function ViewModel() {
             case 'add':
               await self._serviceRequest('info', data['id'])
                 .done(function (data) {
-                  playlist.viewModel.playlist.push(data);
+                  self.eventRouter.raise('addEntityToPlaylistImpl', data);
                 })
                 .fail(function (jqXHR, textStatus, errorThrown) {
                   self.messages(errorThrown);
@@ -116,21 +117,13 @@ function ViewModel() {
                 });
               break;
             case 'remove':
-              playlist.viewModel._removePlaylistItemImpl(data['id']);
+              self.eventRouter.raise('_removePlaylistItemImpl', data['id']);
               break;
             case 'clear':
-              playlist.viewModel.playlist([]);
+              self.eventRouter.raise('clearPlaylistImpl');
               break;
             case 'move':
-              var originalIndex = self.indexOfArrayEx(playlist.viewModel.playlist(), 'id', data['id']);
-
-              if (originalIndex !== -1) {
-                var item = playlist.viewModel.playlist()[originalIndex];
-                var newIndex = data['index'];
-                playlist.viewModel.playlist.splice(originalIndex, 1);
-                playlist.viewModel.playlist.splice(newIndex, 0, item);
-              }
-
+              self.eventRouter.raise('moveImpl', data);
               break;
             default:
               console.log("Unexpected action: " + data['action']);

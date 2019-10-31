@@ -18,7 +18,7 @@ module.exports = function (ko, $) {
             self.focusItem = ko.observable(false);
 
             self.addEntityToPlaylist = function (item) {
-                root.playlistViewModel.addEntityToPlaylist(item);
+                root.eventRouter.raise('addEntityToPlaylist', item);
             };
 
             self.breadcrumbJump = function (item) {
@@ -26,7 +26,6 @@ module.exports = function (ko, $) {
             };
 
             self.requestData = function (id, page) {
-
                 root._serviceRequest('browse', [id, page])
                     .done(function (data) {
                         for (var i = 0; i < data.items.length; i++) {
