@@ -20,10 +20,7 @@ module.exports = function (ko, $) {
                         // NOTE : Socket message will come back to indicate that a playlist item was added
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
 
             };
@@ -39,10 +36,7 @@ module.exports = function (ko, $) {
                         // NOTE : Socket message will come back to indicate that a playlist item was added
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
             };
 
@@ -50,13 +44,9 @@ module.exports = function (ko, $) {
                 root._serviceRequest('playlist', 'list')
                     .done(function (data) {
                         self.playlist(data);
-                        root.messages('');
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
             };
 
@@ -79,10 +69,7 @@ module.exports = function (ko, $) {
                         // NOTE : Socket message will come back to indicate that a playlist item was added
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
             };
 
@@ -175,10 +162,7 @@ module.exports = function (ko, $) {
                                 self.playlist.push(data);
                             })
                             .fail(function (jqXHR, textStatus, errorThrown) {
-                                root.messages(errorThrown);
-                                $("#messages").attr("class", "alert alert-danger");
-                                // TODO : Text not displaying correctly
-                                $("#track-info").html("Error: " + errorThrown);
+                                root.errors.error(errorThrown);
                             });
                         break;
                     case 'remove':

@@ -34,10 +34,17 @@
 
   <div class="container-fluid">
 
-    <!-- ko if: messages().length != 0 -->
-    <div data-bind="text: messages" class="alert alert-info" role="alert">
+    <!-- ko foreach: errors.messages -->
+    <!-- ko if: $data['type'] == $parent.ERROR_TYPES.ERROR -->
+    <div data-bind="text: text" class="alert alert-info" role="alert">
     </div>
     <!-- /ko -->
+    <!-- ko if: $data['type'] == $parent.ERROR_TYPES.INFO -->
+    <div data-bind="text: text" class="alert alert-primary" role="alert">
+    </div>
+    <!-- /ko -->
+    <!-- /ko -->
+
 
     <div class="row">
 

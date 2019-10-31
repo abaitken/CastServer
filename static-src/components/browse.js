@@ -23,10 +23,7 @@ module.exports = function (ko, $) {
                         // NOTE : Socket message will come back to indicate that a playlist item was added
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
             };
 
@@ -42,13 +39,9 @@ module.exports = function (ko, $) {
                         }
                         if (data.items.length > 0)
                             self.requestData(id, page + 1);
-                        root.messages('');
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
             };
 
@@ -137,10 +130,7 @@ module.exports = function (ko, $) {
                                 currentId = data['parentID'];
                             })
                             .fail(function (jqXHR, textStatus, errorThrown) {
-                                root.messages(errorThrown);
-                                $("#messages").attr("class", "alert alert-danger");
-                                // TODO : Text not displaying correctly
-                                $("#track-info").html("Error: " + errorThrown);
+                                root.errors.error(errorThrown);
                             });
                     }
 

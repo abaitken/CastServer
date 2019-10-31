@@ -15,10 +15,7 @@ module.exports = function (ko, $) {
                         // NOTE : Socket message will come back to update
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
             };
 
@@ -28,10 +25,7 @@ module.exports = function (ko, $) {
                         // NOTE : Socket message will come back to update
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
 
             };
@@ -42,10 +36,7 @@ module.exports = function (ko, $) {
                         // NOTE : Socket message will come back to update
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
 
             };
@@ -56,10 +47,7 @@ module.exports = function (ko, $) {
                         // NOTE : Socket message will come back to update
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
 
             };
@@ -70,10 +58,7 @@ module.exports = function (ko, $) {
                         // NOTE : Socket message will come back to update
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
 
             };
@@ -84,10 +69,7 @@ module.exports = function (ko, $) {
                         // NOTE : Socket message will come back to update
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
 
             };
@@ -98,10 +80,7 @@ module.exports = function (ko, $) {
                         // NOTE : Socket message will come back to update
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
 
             };
@@ -112,10 +91,7 @@ module.exports = function (ko, $) {
                         // NOTE : Socket message will come back to update
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
 
             };
@@ -126,10 +102,7 @@ module.exports = function (ko, $) {
                         // NOTE : Socket message will come back to update
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
 
             };
@@ -140,10 +113,7 @@ module.exports = function (ko, $) {
                         // NOTE : Socket message will come back to update
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
 
             };
@@ -154,10 +124,7 @@ module.exports = function (ko, $) {
                         // NOTE : Socket message will come back to update
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.messages(errorThrown);
-                        $("#messages").attr("class", "alert alert-danger");
-                        // TODO : Text not displaying correctly
-                        $("#track-info").html("Error: " + errorThrown);
+                        root.errors.error(errorThrown);
                     });
 
             };

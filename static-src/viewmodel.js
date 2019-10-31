@@ -28,13 +28,36 @@ function EventRouter() {
   };
 }
 
+var ERROR_TYPES = {
+  ERROR: 0,
+  INFO: 1
+};
+function ErrorHandling() {
+  this.ERROR_TYPES = ERROR_TYPES;
+  this.messages = ko.observableArray([]);
+  this.error = function (text) {
+    console.error(text);
+    this.messages.push({
+      text: text,
+      type: ERROR_TYPES.ERROR
+    })
+  };
+  this.info = function (text) {
+    console.log(text);
+    this.messages.push({
+      text: text,
+      type: ERROR_TYPES.INFO
+    })
+  };
+}
+
 function ViewModel() {
   var self = this;
 
-  self.messages = ko.observable("Fetching...");
+  /* Reusable Fns */
   self.eventRouter = new EventRouter();
+  self.errors = new ErrorHandling();
 
-  /* COMMON */
   self._serviceRequest = function (action, urlArgs) {
     var url = "/" + action;
     if (Array.isArray(urlArgs)) {
@@ -80,6 +103,10 @@ function ViewModel() {
     if (socketUrl.lastIndexOf('/') != socketUrl.length - 1)
       socketUrl += "/";
     socketUrl += "ws";
+
+    if (self.webSocket) {
+      self.webSocket.close();
+    }
 
     // TODO : PING/PONG to prevent timeouts?
     self.webSocket = new WebSocket(socketUrl);
