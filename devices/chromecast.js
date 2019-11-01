@@ -36,8 +36,6 @@ module.exports = {
                 );
 
                 self._connection.send({ type: "CONNECT" });
-
-                //self._receiver.on("message", self._messageRecieved);
                 callback();
             });
         }
@@ -48,27 +46,31 @@ module.exports = {
             this._connection.send({ type: "CLOSE" });
         }
 
-        _send(message, callback) {
-            var self = this;
-
+        _send(channelSelector, message, callback) {
             var reponseHandler = function (data, broadcast) {
                 // TODO : Check for corresponding requestId
-                self._receiver.removeListener('message', reponseHandler);
+                channelSelector().removeListener('message', reponseHandler);
                 callback(data, broadcast);
             };
 
             this.Connect(function () {
-                self._receiver.on('message', reponseHandler);
-                self._receiver.send(message);
+                channelSelector().on('message', reponseHandler);
+                channelSelector().send(message);
             });
+
+        }
+
+        _receiverSend(message, callback) {
+            var self = this;
+            this._send(function () { return self._receiver; }, message, callback);
         }
 
         Status(callback) {
-            this._send({ type: "GET_STATUS", requestId: 1 }, callback);
+            this._receiverSend({ type: "GET_STATUS", requestId: 1 }, callback);
         }
 
         SetVolume(level, callback) {
-            this._send({
+            this._receiverSend({
                 type: "VOLUME", requestId: 1, volume: {
                     level: level / 100
                 }
@@ -76,19 +78,19 @@ module.exports = {
         }
 
         Pause(callback) {
-            this._send({ type: "PAUSE", requestId: 1 }, callback);
+            this._receiverSend({ type: "PAUSE", requestId: 1 }, callback);
         }
 
         Play(callback) {
-            this._send({ type: "PLAY", requestId: 1 }, callback);
+            this._receiverSend({ type: "PLAY", requestId: 1 }, callback);
         }
 
         Stop(callback) {
-            this._send({ type: "STOP", requestId: 1 }, callback);
+            this._receiverSend({ type: "STOP", requestId: 1 }, callback);
         }
 
         Mute(callback) {
-            this._send({
+            this._receiverSend({
                 type: "VOLUME", requestId: 1, volume: {
                     muted: 1
                 }
@@ -96,7 +98,7 @@ module.exports = {
         }
 
         Unmute(callback) {
-            this._send({
+            this._receiverSend({
                 type: "VOLUME", requestId: 1, volume: {
                     muted: 0
                 }
