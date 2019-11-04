@@ -89,8 +89,7 @@ module.exports = {
             }
 
             self._send(function () { return self._heartbeat; }, { type: 'PING' }, function (data, broadcast) {
-                // TODO : What if data.type != "PONG" ?
-                if (!self._connected) {
+                if (!self._connected || data['type'] != "PONG") {
                     return;
                 }
                 setTimeout(self._heartbeatSend.bind(self), 5000, self);
