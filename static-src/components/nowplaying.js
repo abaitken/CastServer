@@ -156,16 +156,19 @@ module.exports = function (ko, $) {
                         root.errors.error(errorThrown);
                     });
             };
-            
+
             self.updateVolumeSubscription = false;
 
             self.getStatus = function () {
                 root._serviceRequest('cast', ['status'])
                     .done(function (data) {
-                        if(self.updateVolumeSubscription)
+                        if (self.updateVolumeSubscription)
                             self.updateVolumeSubscription.dispose();
-                        self.volume(data['volume']['level'] * 100);
-                        self.updateVolumeSubscription = self.volume.subscribe(function(newValue) { self.updateVolume(newValue); })
+                        self.volume({
+                            level: data['volume']['level'] * 100,
+                            muted: data['volume']['muted'] === 1 ? true : false
+                        });
+                        self.updateVolumeSubscription = self.volume.subscribe(function (newValue) { self.updateVolume(newValue); })
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
                         root.errors.error(errorThrown);
@@ -188,6 +191,59 @@ module.exports = function (ko, $) {
                 }
 
                 switch (data['action']) {
+                    case 'repeat':
+                        var repeatButton = $('#repeatButton');
+                        if (repeatButton.hasclass('button-state-toggled'))
+                            repeatButton.removeClass('button-state-toggled');
+                        else
+                            repeatButton.addClass('button-state-toggled');
+                        break;
+                    case 'shuffle':
+                        var shuffleButton = $('#shuffleButton');
+                        if (shuffleButton.hasclass('button-state-toggled'))
+                            shuffleButton.removeClass('button-state-toggled');
+                        else
+                            shuffleButton.addClass('button-state-toggled');
+                        break;
+                    case 'seekahead':
+                        // TODO : Implement
+                        break;
+                    case 'rewind':
+                        // TODO : Implement
+                        break;
+                    case 'previous':
+                        // TODO : Implement
+                        break;
+                    case 'next':
+                        // TODO : Implement
+                        break;
+                    case 'stop':
+                        self.playbackState(PLAYBACK_STATES.STOPPED);
+                        break;
+                    case 'play':
+                        self.playbackState(PLAYBACK_STATES.PLAYING);
+                        break;
+                    case 'pause':
+                        self.playbackState(PLAYBACK_STATES.PAUSED);
+                        break;
+                    case 'unmute':
+                        self.volume({
+                            level: self.volume().level,
+                            muted: false
+                        });
+                        break;
+                    case 'mute':
+                        self.volume({
+                            level: self.volume().level,
+                            muted: true
+                        });
+                        break;
+                    case 'volume':
+                        self.volume({
+                            level: data['value'],
+                            muted: self.volume().muted
+                        });
+                        break;
                     default:
                         console.log("Unexpected action: " + data['action']);
                         break;
