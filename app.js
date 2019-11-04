@@ -10,6 +10,7 @@ const server = http.createServer(app);
 var notifications = require('./notifications.js');
 var notifier = new notifications.Notifier(server);
 
+require("./discover")(app, config);
 require("./browse")(app, config);
 require("./cast")(app, notifier, config);
 require("./playlist")(app, notifier, config);
