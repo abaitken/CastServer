@@ -1,5 +1,9 @@
 const Client = require("castv2").Client;
 
+const CONSTANT_APP_IDS = {
+    DEFAULT_MEDIA_RECEIVER: "CC1AD845"
+};
+
 module.exports = {
     Chromecast: class Chromecast {
         constructor(host) {
@@ -32,6 +36,13 @@ module.exports = {
                     "sender-0",
                     "receiver-0",
                     "urn:x-cast:com.google.cast.receiver",
+                    "JSON"
+                );
+
+                self._media = self._client.createChannel(
+                    "sender-0",
+                    "receiver-0",
+                    "urn:x-cast:com.google.cast.media",
                     "JSON"
                 );
 
@@ -83,14 +94,22 @@ module.exports = {
             });
         }
 
-
         _receiverSend(message, callback) {
             var self = this;
             this._send(function () { return self._receiver; }, message, callback);
         }
 
+        _mediaSend(message, callback) {
+            var self = this;
+            this._send(function () { return self._media; }, message, callback);
+        }
+
         Status(callback) {
             this._receiverSend({ type: "GET_STATUS", requestId: 1 }, callback);
+        }
+
+        MediaStatus(callback) {
+            this._mediaSend({ type: "GET_STATUS", requestId: 1 }, callback);
         }
 
         SetVolume(level, callback) {
@@ -102,21 +121,21 @@ module.exports = {
         }
 
         Pause(callback) {
-            this._receiverSend({ type: "PAUSE", requestId: 1 }, callback);
+            this._mediaSend({ type: "PAUSE", requestId: 1, mediaSessionId: this.mediaSession }, callback);
         }
 
         Play(callback) {
-            this._receiverSend({ type: "PLAY", requestId: 1 }, callback);
+            this._mediaSend({ type: "PLAY", requestId: 1, mediaSessionId: this.mediaSession }, callback);
         }
 
         Stop(callback) {
-            this._receiverSend({ type: "STOP", requestId: 1 }, callback);
+            this._mediaSend({ type: "STOP", requestId: 1, mediaSessionId: this.mediaSession }, callback);
         }
 
         Mute(callback) {
             this._receiverSend({
                 type: "VOLUME", requestId: 1, volume: {
-                    muted: 1
+                    muted: true
                 }
             }, callback);
         }
@@ -124,7 +143,7 @@ module.exports = {
         Unmute(callback) {
             this._receiverSend({
                 type: "VOLUME", requestId: 1, volume: {
-                    muted: 0
+                    muted: false
                 }
             }, callback);
         }
