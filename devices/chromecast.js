@@ -35,6 +35,14 @@ module.exports = {
                     "JSON"
                 );
 
+                self._heartbeat = self._client.createChannel(
+                    "sender-0",
+                    "receiver-0",
+                    "urn:x-cast:com.google.cast.tp.heartbeat",
+                    "JSON"
+                );
+                setTimeout(self._heartbeatSend, 5000);
+
                 self._connection.send({ type: "CONNECT" });
                 callback();
             });
@@ -48,9 +56,11 @@ module.exports = {
 
         _send(channelSelector, message, callback) {
             var reponseHandler = function (data, broadcast) {
-                // TODO : Check for corresponding requestId
-                channelSelector().removeListener('message', reponseHandler);
-                callback(data, broadcast);
+                if (data['requestId'] == data.requestId) {
+                    // TODO : Check for corresponding requestId
+                    channelSelector().removeListener('message', reponseHandler);
+                    callback(data, broadcast);
+                }
             };
 
             this.Connect(function () {
@@ -59,6 +69,20 @@ module.exports = {
             });
 
         }
+
+        _heartbeatSend() {
+            if (!this._connected) {
+                return;
+            }
+
+            var self = this;
+            this._send(function () { return self._heartbeat; }, { type: 'PING' }, function (data, broadcast) {
+                console.log(data);
+                console.log(broadcast);
+                setTimeout(self._heartbeatSend, 5000);
+            });
+        }
+
 
         _receiverSend(message, callback) {
             var self = this;
