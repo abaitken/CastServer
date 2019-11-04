@@ -1,6 +1,6 @@
 const Client = require("castv2").Client;
 
-const CONSTANT_APP_IDS = {
+const APP_IDS = {
     DEFAULT_MEDIA_RECEIVER: "CC1AD845"
 };
 
@@ -52,7 +52,7 @@ module.exports = {
                     "urn:x-cast:com.google.cast.tp.heartbeat",
                     "JSON"
                 );
-                setTimeout(self._heartbeatSend, 5000);
+                setTimeout(self._heartbeatSend.bind(self), 5000, self);
 
                 self._connection.send({ type: "CONNECT" });
                 callback();
@@ -67,8 +67,9 @@ module.exports = {
 
         _send(channelSelector, message, callback) {
             var reponseHandler = function (data, broadcast) {
-                if (data['requestId'] == data.requestId) {
-                    // TODO : Check for corresponding requestId
+                console.log(data);
+                console.log(broadcast);
+                if (!message['requestId'] || data['requestId'] == message['requestId']) {
                     channelSelector().removeListener('message', reponseHandler);
                     callback(data, broadcast);
                 }
@@ -82,15 +83,17 @@ module.exports = {
         }
 
         _heartbeatSend() {
-            if (!this._connected) {
+            var self = this;
+            if (!self._connected) {
                 return;
             }
 
-            var self = this;
-            this._send(function () { return self._heartbeat; }, { type: 'PING' }, function (data, broadcast) {
-                console.log(data);
-                console.log(broadcast);
-                setTimeout(self._heartbeatSend, 5000);
+            self._send(function () { return self._heartbeat; }, { type: 'PING' }, function (data, broadcast) {
+                // TODO : What if data.type != "PONG" ?
+                if (!self._connected) {
+                    return;
+                }
+                setTimeout(self._heartbeatSend.bind(self), 5000, self);
             });
         }
 
