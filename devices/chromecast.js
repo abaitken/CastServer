@@ -9,6 +9,7 @@ module.exports = {
         constructor(host) {
             this._host = host;
             this._connected = false;
+            this._mediaSession = null;
         }
 
         get IsConnected() {
@@ -77,6 +78,7 @@ module.exports = {
 
             this.Connect(function () {
                 channelSelector().on('message', reponseHandler);
+                console.log(message);
                 channelSelector().send(message);
             });
 
@@ -106,32 +108,63 @@ module.exports = {
             this._send(function () { return self._media; }, message, callback);
         }
 
+        _getMediaSession(callback) {
+            var self = this;
+            if (self._mediaSession !== false) {
+                callback(self._mediaSession);
+                return;
+            }
+
+            self.Status(function (data, broadcast) {
+                self._mediaSession = 0; //data['status']['applications']['0']['sessionId'];
+                callback(self._mediaSession);
+            });
+        }
+
         Status(callback) {
             this._receiverSend({ type: "GET_STATUS", requestId: 1 }, callback);
         }
 
         MediaStatus(callback) {
-            this._mediaSend({ type: "GET_STATUS", requestId: 1 }, callback);
+            var self = this;
+            self._getMediaSession(function (sessionId) {
+                self._receiverSend({ type: "GET_STATUS", requestId: 1, mediaSessionId: sessionId }, callback);
+            });
         }
 
         SetVolume(level, callback) {
-            this._receiverSend({
-                type: "VOLUME", requestId: 1, volume: {
-                    level: level / 100
-                }
-            }, callback);
+            var self = this;
+            self._getMediaSession(function (sessionId) {
+                self._receiverSend({
+                    type: "VOLUME",
+                    requestId: 1,
+                    mediaSessionId: sessionId,
+                    volume: {
+                        level: level / 100
+                    }
+                }, callback);
+            });
         }
 
         Pause(callback) {
-            this._mediaSend({ type: "PAUSE", requestId: 1, mediaSessionId: this.mediaSession }, callback);
+            var self = this;
+            self._getMediaSession(function (sessionId) {
+                self._receiverSend({ type: "PAUSE", requestId: 1, mediaSessionId: sessionId }, callback);
+            });
         }
 
         Play(callback) {
-            this._mediaSend({ type: "PLAY", requestId: 1, mediaSessionId: this.mediaSession }, callback);
+            var self = this;
+            self._getMediaSession(function (sessionId) {
+                self._receiverSend({ type: "PLAY", requestId: 1, mediaSessionId: sessionId }, callback);
+            });
         }
 
         Stop(callback) {
-            this._mediaSend({ type: "STOP", requestId: 1, mediaSessionId: this.mediaSession }, callback);
+            var self = this;
+            self._getMediaSession(function (sessionId) {
+                self._receiverSend({ type: "STOP", requestId: 1, mediaSessionId: sessionId }, callback);
+            });
         }
 
         Mute(callback) {
