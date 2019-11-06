@@ -89,19 +89,18 @@
     </div>
 
     <div class="slidecontainer">
-
-        <!-- ko ifnot: $data.volume.muted -->
+        <!-- ko ifnot: muted -->
         <button type="button" class="btn btn-default" data-bind="click: mute, clickBubble: false" id="muteButton">
             <i class="fas fa-volume-up fa-lg"></i>
         </button>
         <!-- /ko -->
-        <!-- ko if: $data.volume.muted -->
+        <!-- ko if: muted -->
         <button type="button" class="btn btn-default" data-bind="click: unmute, clickBubble: false" id="unmuteButton">
             <i class="fas fa-volume-mute fa-lg"></i>
         </button>
         <!-- /ko -->
-        <input type="range" min="0" max="100" data-bind="value: volume.level, valueUpdate: 'keyup'" class="slider"
+        <input type="range" min="0" max="100" data-bind="value: volumeLevel, valueUpdate: 'keyup'" class="slider"
             id="volumeSlider">
-        <div data-bind="text: volume.level"></div>
+        <div data-bind="text: volumeLevel"></div>
     </div>
 </div>

@@ -15,10 +15,9 @@ module.exports = function (ko, $) {
             self.trackTimePassed = ko.observable(0);
             self.trackTimeRemaining = ko.observable(0);
             self.trackProgress = ko.observable('50%');
-            self.volume = ko.observable({
-                level: 50,
-                muted: false
-            });
+            self.volumeLevel = ko.observable(50);
+            self.muted = ko.observable(false);
+            
             self.playbackState = ko.observable(PLAYBACK_STATES.PAUSED);
             self.currentPlayingMedia = ko.observable({
                 artist: "Artist",
@@ -45,7 +44,6 @@ module.exports = function (ko, $) {
                     .fail(function (jqXHR, textStatus, errorThrown) {
                         root.errors.error(errorThrown);
                     });
-
             };
 
             self.play = function () {
@@ -56,7 +54,6 @@ module.exports = function (ko, $) {
                     .fail(function (jqXHR, textStatus, errorThrown) {
                         root.errors.error(errorThrown);
                     });
-
             };
 
             self.pause = function () {
@@ -67,7 +64,6 @@ module.exports = function (ko, $) {
                     .fail(function (jqXHR, textStatus, errorThrown) {
                         root.errors.error(errorThrown);
                     });
-
             };
 
             self.forward = function () {
@@ -78,7 +74,6 @@ module.exports = function (ko, $) {
                     .fail(function (jqXHR, textStatus, errorThrown) {
                         root.errors.error(errorThrown);
                     });
-
             };
 
             self.seekahead = function () {
@@ -89,7 +84,6 @@ module.exports = function (ko, $) {
                     .fail(function (jqXHR, textStatus, errorThrown) {
                         root.errors.error(errorThrown);
                     });
-
             };
 
             self.shuffle = function () {
@@ -100,7 +94,6 @@ module.exports = function (ko, $) {
                     .fail(function (jqXHR, textStatus, errorThrown) {
                         root.errors.error(errorThrown);
                     });
-
             };
 
             self.repeat = function () {
@@ -111,7 +104,6 @@ module.exports = function (ko, $) {
                     .fail(function (jqXHR, textStatus, errorThrown) {
                         root.errors.error(errorThrown);
                     });
-
             };
 
             self.mute = function () {
@@ -122,7 +114,6 @@ module.exports = function (ko, $) {
                     .fail(function (jqXHR, textStatus, errorThrown) {
                         root.errors.error(errorThrown);
                     });
-
             };
 
             self.unmute = function () {
@@ -133,7 +124,6 @@ module.exports = function (ko, $) {
                     .fail(function (jqXHR, textStatus, errorThrown) {
                         root.errors.error(errorThrown);
                     });
-
             };
 
             self.stop = function () {
@@ -144,7 +134,6 @@ module.exports = function (ko, $) {
                     .fail(function (jqXHR, textStatus, errorThrown) {
                         root.errors.error(errorThrown);
                     });
-
             };
 
             self.updateVolume = function (newValue) {
@@ -164,11 +153,9 @@ module.exports = function (ko, $) {
                     .done(function (data) {
                         if (self.updateVolumeSubscription)
                             self.updateVolumeSubscription.dispose();
-                        self.volume({
-                            level: data['volume']['level'] * 100,
-                            muted: data['volume']['muted'] === 1 ? true : false
-                        });
-                        self.updateVolumeSubscription = self.volume.subscribe(function (newValue) { self.updateVolume(newValue); })
+                        self.volumeLevel(data['volume']['level'] * 100);
+                        self.muted(data['volume']['muted'] === 1 ? true : false);
+                        self.updateVolumeSubscription = self.volumeLevel.subscribe(function (newValue) { self.updateVolume(newValue); })
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
                         root.errors.error(errorThrown);
@@ -182,7 +169,7 @@ module.exports = function (ko, $) {
 
                 var data = args;
 
-                if (data['category'] !== 'nowplaying')
+                if (data['category'] !== 'cast')
                     return;
 
                 if (!data['action']) {
@@ -227,22 +214,14 @@ module.exports = function (ko, $) {
                         self.playbackState(PLAYBACK_STATES.PAUSED);
                         break;
                     case 'unmute':
-                        self.volume({
-                            level: self.volume().level,
-                            muted: false
-                        });
+                        self.muted(false);
                         break;
                     case 'mute':
-                        self.volume({
-                            level: self.volume().level,
-                            muted: true
-                        });
+                        self.muted(true);
                         break;
                     case 'volume':
-                        self.volume({
-                            level: data['value'],
-                            muted: self.volume().muted
-                        });
+                        if(self.volumeLevel() != data['value'])
+                            self.volumeLevel(data['value']);
                         break;
                     default:
                         console.log("Unexpected action: " + data['action']);
