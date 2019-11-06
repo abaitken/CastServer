@@ -3,7 +3,18 @@ const Chromecast = require('./devices/chromecast.js').Chromecast;
 module.exports = function (app, notifier, config) {
   // TODO : Resolve this hard coded device!
   var host = config.devices[1]['address'];
-  var client = new Chromecast(host);
+  var client = new Chromecast(host, function (data) {
+    console.log("broadcast");
+    console.log(data);
+
+    if (data['type'] == 'RECEIVER_STATUS') {
+      notifier.NotifyClients({ "category": "cast", "action": "volume", "value": (data['status']['volume']['level'] * 100) });
+      if (data['status']['volume']['muted'])
+        notifier.NotifyClients({ "category": "cast", "action": "mute" });
+      else
+        notifier.NotifyClients({ "category": "cast", "action": "unmute" });
+    }
+  });
 
   app.get("/cast/status", (req, res, next) => {
     client.Status(function (data) {
@@ -88,6 +99,36 @@ module.exports = function (app, notifier, config) {
     client.SetVolume(req.params['newvalue'], function (data) {
       res.json(data);
       notifier.NotifyClients({ "category": "cast", "action": "volume", "value": req.params['newvalue'] });
+    });
+  });
+
+  app.get("/cast/launch", (req, res, next) => {
+    // TODO : Implement
+    client.Launch(function (data) {
+      res.json(data);
+    })
+  });
+
+  app.get("/cast/load", (req, res, next) => {
+    // TODO : Implement
+    client.Load({
+
+      // Here you can plug an URL to any mp4, webm, mp3 or jpg file with the proper contentType.
+      contentId: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
+      contentType: 'video/mp4',
+      streamType: 'BUFFERED', // or LIVE
+
+      // Title and cover displayed while buffering
+      metadata: {
+        type: 0,
+        metadataType: 0,
+        title: "Big Buck Bunny",
+        images: [
+          { url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg' }
+        ]
+      }
+    }, function (data) {
+      res.json(data);
     });
   });
 

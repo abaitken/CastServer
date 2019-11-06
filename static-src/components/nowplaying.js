@@ -17,7 +17,7 @@ module.exports = function (ko, $) {
             self.trackProgress = ko.observable('50%');
             self.volumeLevel = ko.observable(50);
             self.muted = ko.observable(false);
-            
+
             self.playbackState = ko.observable(PLAYBACK_STATES.PAUSED);
             self.currentPlayingMedia = ko.observable({
                 artist: "Artist",
@@ -147,6 +147,7 @@ module.exports = function (ko, $) {
             };
 
             self.updateVolumeSubscription = false;
+            self.updateVolumeSuspended = false;
 
             self.getStatus = function () {
                 root._serviceRequest('cast', ['status'])
@@ -155,7 +156,10 @@ module.exports = function (ko, $) {
                             self.updateVolumeSubscription.dispose();
                         self.volumeLevel(data['volume']['level'] * 100);
                         self.muted(data['volume']['muted'] === 1 ? true : false);
-                        self.updateVolumeSubscription = self.volumeLevel.subscribe(function (newValue) { self.updateVolume(newValue); })
+                        self.updateVolumeSubscription = self.volumeLevel.subscribe(function (newValue) {
+                            if (!self.updateVolumeSuspended)
+                                self.updateVolume(newValue);
+                        })
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
                         root.errors.error(errorThrown);
@@ -220,8 +224,12 @@ module.exports = function (ko, $) {
                         self.muted(true);
                         break;
                     case 'volume':
-                        if(self.volumeLevel() != data['value'])
+                        if (self.volumeLevel() != data['value'])
+                        {
+                            self.updateVolumeSuspended = true;
                             self.volumeLevel(data['value']);
+                            self.updateVolumeSuspended = false;
+                        }
                         break;
                     default:
                         console.log("Unexpected action: " + data['action']);

@@ -6,10 +6,11 @@ const APP_IDS = {
 
 module.exports = {
     Chromecast: class Chromecast {
-        constructor(host) {
+        constructor(host, broadcastCallback) {
             this._host = host;
             this._connected = false;
             this._mediaSession = null;
+            this._broadcastCallback = broadcastCallback;
         }
 
         get IsConnected() {
@@ -39,6 +40,10 @@ module.exports = {
                     "urn:x-cast:com.google.cast.receiver",
                     "JSON"
                 );
+                self._receiver.on('message', function (data, broadcast) {
+                    if (broadcast)
+                        self._broadcastCallback(data);
+                });
 
                 self._media = self._client.createChannel(
                     "sender-0",
@@ -46,6 +51,10 @@ module.exports = {
                     "urn:x-cast:com.google.cast.media",
                     "JSON"
                 );
+                self._media.on('message', function (data, broadcast) {
+                    if (broadcast)
+                        self._broadcastCallback(data);
+                });
 
                 self._heartbeat = self._client.createChannel(
                     "sender-0",
@@ -77,7 +86,9 @@ module.exports = {
             };
 
             this.Connect(function () {
-                channelSelector().on('message', reponseHandler);
+
+                if (callback !== undefined)
+                    channelSelector().on('message', reponseHandler);
                 console.log(message);
                 channelSelector().send(message);
             });
@@ -136,13 +147,35 @@ module.exports = {
             var self = this;
             self._getMediaSession(function (sessionId) {
                 self._receiverSend({
-                    type: "VOLUME",
+                    type: "SET_VOLUME",
                     requestId: 1,
                     mediaSessionId: sessionId,
                     volume: {
                         level: level / 100
                     }
                 }, callback);
+            });
+        }
+
+        Launch(callback) {
+            var self = this;
+            self._receiverSend({
+                type: "LAUNCH",
+                appId: APP_IDS.DEFAULT_MEDIA_RECEIVER,
+            }, function (data, broadcast) {
+                callback(data, broadcast);
+            });
+        }
+
+        Load(media, callback) {
+            var self = this;
+            self._mediaSend({
+                type: "LOAD",
+                requestId: 1,
+                media: media,
+            }, function (data, broadcast) {
+                self._mediaSession = ['mediaSessionId'];
+                callback(data, broadcast);
             });
         }
 
@@ -169,7 +202,7 @@ module.exports = {
 
         Mute(callback) {
             this._receiverSend({
-                type: "VOLUME", requestId: 1, volume: {
+                type: "SET_VOLUME", requestId: 1, volume: {
                     muted: true
                 }
             }, callback);
@@ -177,7 +210,7 @@ module.exports = {
 
         Unmute(callback) {
             this._receiverSend({
-                type: "VOLUME", requestId: 1, volume: {
+                type: "SET_VOLUME", requestId: 1, volume: {
                     muted: false
                 }
             }, callback);
