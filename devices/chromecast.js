@@ -108,6 +108,7 @@ class Heartbeat extends ChannelBase {
 }
 
 module.exports = {
+    APP_IDS: APP_IDS,
     Chromecast: class Chromecast {
         constructor(host, broadcastCallback) {
             this._host = host;
@@ -195,12 +196,12 @@ module.exports = {
             });
         }
 
-        Launch(callback) {
+        Launch(appId, callback) {
             var self = this;
             this.Connect(function () {
                 self._receiver.send({
                     type: "LAUNCH",
-                    appId: APP_IDS.DEFAULT_MEDIA_RECEIVER,
+                    appId: appId,
                 }, function (data, broadcast) {
                     callback(data, broadcast);
                 });

@@ -1,9 +1,9 @@
-const Chromecast = require('../devices/chromecast').Chromecast;
+const Chromecast = require('../devices/chromecast');
 
 module.exports = function (app, notifier, config) {
   // TODO : Resolve this hard coded device!
   var host = config.devices[0]['address'];
-  var client = new Chromecast(host, function (data) {
+  var client = new Chromecast.Chromecast(host, function (data) {
     console.log("broadcast");
     console.log(data);
 
@@ -94,8 +94,6 @@ module.exports = function (app, notifier, config) {
   });
 
   app.get("/cast/volume/:newvalue", (req, res, next) => {
-    // TODO : Implement
-    // TODO : Resolve this hard coded device!
     client.SetVolume(req.params['newvalue'], function (data) {
       res.json(data);
       notifier.NotifyClients({ "category": "cast", "action": "volume", "value": req.params['newvalue'] });
@@ -103,8 +101,7 @@ module.exports = function (app, notifier, config) {
   });
 
   app.get("/cast/launch", (req, res, next) => {
-    // TODO : Implement
-    client.Launch(function (data) {
+    client.Launch(Chromecast.APP_IDS.DEFAULT_MEDIA_RECEIVER, function (data) {
       res.json(data);
     })
   });
