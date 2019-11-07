@@ -1,8 +1,111 @@
+const EventEmitter = require('events').EventEmitter;
 const Client = require("castv2").Client;
 
 const APP_IDS = {
     DEFAULT_MEDIA_RECEIVER: "CC1AD845"
 };
+
+class ChannelBase extends EventEmitter {
+    constructor(client, sender, receiver, urn) {
+        super();
+        this._channel = client.createChannel(sender, receiver, urn, 'JSON');
+
+        var self = this;
+
+        function onclose() {
+            self._channel.removeListener('message', onmessage);
+            self.emit('close');
+        }
+
+        this._channel.on('message', function (data, broadcast) {
+            if (broadcast)
+                self.emit('broadcast', data);
+            else
+                self.emit('message', data);
+        });
+        this._channel.once('close', onclose);
+    }
+
+    send(data, callback) {
+        var self = this;
+
+        function onmessage(response, broadcast) {
+            console.log(response);
+            var result = callback(response, broadcast);
+            if (result) {
+                self._channel.removeListener('message', onmessage);
+            }
+        }
+
+        if (callback !== undefined)
+        self._channel.on('message', onmessage);
+        console.log(data);
+        self._channel.send(data);
+    }
+
+    close() {
+        this._channel.close();
+    }
+}
+
+class ChannelRequestFiltering extends ChannelBase {
+    constructor(client, sender, receiver, urn) {
+        super(client, sender, receiver, urn);
+        this._requestId = 1;
+    }
+
+    send(data, callback) {
+        var self = this;
+        var requestId = ++this._requestId;
+        data.requestId = requestId;
+
+        super.send(data, function (response, broadcast) {
+            if (response.requestId === requestId) {
+                callback(response, broadcast);
+                return true;
+            }
+            return false;
+        });
+    }
+}
+
+class Connection extends ChannelRequestFiltering {
+    constructor(client) {
+        super(client, "sender-0", "receiver-0", "urn:x-cast:com.google.cast.tp.connection");
+    }
+}
+
+class Receiver extends ChannelRequestFiltering {
+    constructor(client) {
+        super(client, "sender-0", "receiver-0", "urn:x-cast:com.google.cast.receiver");
+    }
+}
+
+class Media extends ChannelRequestFiltering {
+    constructor(client) {
+        super(client, "sender-0", "receiver-0", "urn:x-cast:com.google.cast.media");
+    }
+}
+
+class Heartbeat extends ChannelBase {
+    constructor(client) {
+        super(client, "sender-0", "receiver-0", "urn:x-cast:com.google.cast.tp.heartbeat");
+        var self = this;
+        // TODO : Stop heartbeat on close
+        setTimeout(self._onheartbeat.bind(self), 5000);
+    }
+
+    _onheartbeat() {
+        var self = this;
+        super.send({ type: 'PING' }, function (data, broadcast) {
+            if (/*!self._connected || */data['type'] != "PONG") {
+                return true;
+            }
+            setTimeout(self._onheartbeat.bind(self), 5000, self);
+            return true;
+        });
+    }
+}
 
 module.exports = {
     Chromecast: class Chromecast {
@@ -27,44 +130,21 @@ module.exports = {
             this._client = new Client();
             this._client.connect(this._host, function () {
                 self._connected = true;
-                self._connection = self._client.createChannel(
-                    "sender-0",
-                    "receiver-0",
-                    "urn:x-cast:com.google.cast.tp.connection",
-                    "JSON"
-                );
+                self._connection = new Connection(self._client);
 
-                self._receiver = self._client.createChannel(
-                    "sender-0",
-                    "receiver-0",
-                    "urn:x-cast:com.google.cast.receiver",
-                    "JSON"
-                );
-                self._receiver.on('message', function (data, broadcast) {
-                    if (broadcast)
-                        self._broadcastCallback(data);
+                self._receiver = new Receiver(self._client);
+                self._receiver.on('broadcast', function (data) {
+                    self._broadcastCallback(data);
                 });
 
-                self._media = self._client.createChannel(
-                    "sender-0",
-                    "receiver-0",
-                    "urn:x-cast:com.google.cast.media",
-                    "JSON"
-                );
-                self._media.on('message', function (data, broadcast) {
-                    if (broadcast)
-                        self._broadcastCallback(data);
+                self._media = new Media(self._client);
+                self._media.on('broadcast', function (data) {
+                    self._broadcastCallback(data);
                 });
-
-                self._heartbeat = self._client.createChannel(
-                    "sender-0",
-                    "receiver-0",
-                    "urn:x-cast:com.google.cast.tp.heartbeat",
-                    "JSON"
-                );
-                setTimeout(self._heartbeatSend.bind(self), 5000, self);
 
                 self._connection.send({ type: "CONNECT" });
+                self._heartbeat = new Heartbeat(self._client);
+
                 callback();
             });
         }
@@ -73,50 +153,6 @@ module.exports = {
             this._connected = false;
             // TODO : Remove all event subscriptions
             this._connection.send({ type: "CLOSE" });
-        }
-
-        _send(channelSelector, message, callback) {
-            var reponseHandler = function (data, broadcast) {
-                console.log(data);
-                console.log(broadcast);
-                if (!message['requestId'] || data['requestId'] == message['requestId']) {
-                    channelSelector().removeListener('message', reponseHandler);
-                    callback(data, broadcast);
-                }
-            };
-
-            this.Connect(function () {
-
-                if (callback !== undefined)
-                    channelSelector().on('message', reponseHandler);
-                console.log(message);
-                channelSelector().send(message);
-            });
-
-        }
-
-        _heartbeatSend() {
-            var self = this;
-            if (!self._connected) {
-                return;
-            }
-
-            self._send(function () { return self._heartbeat; }, { type: 'PING' }, function (data, broadcast) {
-                if (!self._connected || data['type'] != "PONG") {
-                    return;
-                }
-                setTimeout(self._heartbeatSend.bind(self), 5000, self);
-            });
-        }
-
-        _receiverSend(message, callback) {
-            var self = this;
-            this._send(function () { return self._receiver; }, message, callback);
-        }
-
-        _mediaSend(message, callback) {
-            var self = this;
-            this._send(function () { return self._media; }, message, callback);
         }
 
         _getMediaSession(callback) {
@@ -133,22 +169,24 @@ module.exports = {
         }
 
         Status(callback) {
-            this._receiverSend({ type: "GET_STATUS", requestId: 1 }, callback);
+            var self = this;
+            this.Connect(function () {
+                self._receiver.send({ type: "GET_STATUS" }, callback);
+            });
         }
 
         MediaStatus(callback) {
             var self = this;
-            self._getMediaSession(function (sessionId) {
-                self._receiverSend({ type: "GET_STATUS", requestId: 1, mediaSessionId: sessionId }, callback);
+            this.Connect(function () {
+                self._receiver.send({ type: "GET_STATUS", mediaSessionId: sessionId }, callback);
             });
         }
 
         SetVolume(level, callback) {
             var self = this;
             self._getMediaSession(function (sessionId) {
-                self._receiverSend({
+                self._receiver.send({
                     type: "SET_VOLUME",
-                    requestId: 1,
                     mediaSessionId: sessionId,
                     volume: {
                         level: level / 100
@@ -159,61 +197,69 @@ module.exports = {
 
         Launch(callback) {
             var self = this;
-            self._receiverSend({
-                type: "LAUNCH",
-                appId: APP_IDS.DEFAULT_MEDIA_RECEIVER,
-            }, function (data, broadcast) {
-                callback(data, broadcast);
+            this.Connect(function () {
+                self._receiver.send({
+                    type: "LAUNCH",
+                    appId: APP_IDS.DEFAULT_MEDIA_RECEIVER,
+                }, function (data, broadcast) {
+                    callback(data, broadcast);
+                });
             });
         }
 
         Load(media, callback) {
             var self = this;
-            self._mediaSend({
-                type: "LOAD",
-                requestId: 1,
-                media: media,
-            }, function (data, broadcast) {
-                self._mediaSession = ['mediaSessionId'];
-                callback(data, broadcast);
+            this.Connect(function () {
+                self._receiver.send({
+                    type: "LOAD",
+                    media: media,
+                }, function (data, broadcast) {
+                    callback(data, broadcast);
+                });
             });
         }
 
         Pause(callback) {
             var self = this;
             self._getMediaSession(function (sessionId) {
-                self._receiverSend({ type: "PAUSE", requestId: 1, mediaSessionId: sessionId }, callback);
+                self._receiver.send({ type: "PAUSE", mediaSessionId: sessionId }, callback);
             });
         }
 
         Play(callback) {
             var self = this;
             self._getMediaSession(function (sessionId) {
-                self._receiverSend({ type: "PLAY", requestId: 1, mediaSessionId: sessionId }, callback);
+                self._receiver.send({ type: "PLAY", mediaSessionId: sessionId }, callback);
             });
         }
 
         Stop(callback) {
             var self = this;
             self._getMediaSession(function (sessionId) {
-                self._receiverSend({ type: "STOP", requestId: 1, mediaSessionId: sessionId }, callback);
+                self._receiver.send({ type: "STOP", mediaSessionId: sessionId }, callback);
             });
         }
 
         Mute(callback) {
-            this._receiverSend({
-                type: "SET_VOLUME", requestId: 1, volume: {
-                    muted: true
-                }
-            }, callback);
+            var self = this;
+            this.Connect(function () {
+                self._receiver.send({
+                    type: "SET_VOLUME", volume: {
+                        muted: true
+                    }
+                }, callback);
+            });
         }
 
         Unmute(callback) {
-            this._receiverSend({
-                type: "SET_VOLUME", requestId: 1, volume: {
-                    muted: false
-                }
-            }, callback);
+            var self = this;
+            this.Connect(function () {
+                self._receiver.send({
+                    type: "SET_VOLUME", volume: {
+                        muted: false
+                    }
+                }, callback);
+            });
         }
     }
 };

@@ -2,7 +2,7 @@ const Chromecast = require('./devices/chromecast.js').Chromecast;
 
 module.exports = function (app, notifier, config) {
   // TODO : Resolve this hard coded device!
-  var host = config.devices[1]['address'];
+  var host = config.devices[0]['address'];
   var client = new Chromecast(host, function (data) {
     console.log("broadcast");
     console.log(data);
