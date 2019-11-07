@@ -4,6 +4,8 @@ var config = require('./config.json');
 var express = require("express");
 const app = express();
 
+var compression = require('compression');
+app.use(compression());
 app.use(express.static('static'));
 const server = http.createServer(app);
 

@@ -20,6 +20,7 @@
   "homepage": "https://github.com/abaitken/CastServer#readme",
   "dependencies": {
     "castv2": "^0.1.10",
+    "compression": "^1.7.4",
     "express": "^4.17.1",
     "node-dns-sd": "^0.4.0",
     "request": "^2.88.0",
