@@ -211,7 +211,7 @@ module.exports = {
         Load(media, callback) {
             var self = this;
             this.Connect(function () {
-                self._receiver.send({
+                self._media.send({
                     type: "LOAD",
                     media: media,
                 }, function (data, broadcast) {

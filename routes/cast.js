@@ -110,6 +110,11 @@ module.exports = function (app, notifier, config) {
     // TODO : Implement
     client.Load({
 
+      autoplay: true,
+      currentTime: 0,
+      activeTrackIds: [],
+      repeatMode: "REPEAT_OFF",
+
       // Here you can plug an URL to any mp4, webm, mp3 or jpg file with the proper contentType.
       contentId: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
       contentType: 'video/mp4',
