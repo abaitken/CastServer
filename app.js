@@ -6,6 +6,10 @@ const app = express();
 
 var compression = require('compression');
 app.use(compression());
+
+var helmet = require('helmet');
+app.use(helmet());
+
 app.use(express.static('static'));
 const server = http.createServer(app);
 
