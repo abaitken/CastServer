@@ -6,8 +6,8 @@ function CreateErrorResult(body, error) {
   };
 }
 
-let ProcessDNLAData = require('./transform-dlna-data.js').ProcessDNLAData;
-let DLNAClient = require('./dlna.js').Client;
+let ProcessDNLAData = require('../transform-dlna-data').ProcessDNLAData;
+let DLNAClient = require('../media-sources/dlna').Client;
 
 module.exports = function (app, config) {
 

@@ -71,8 +71,8 @@ class Playlist {
 }
 
 var g_playlist = new Playlist();
-let ProcessDNLAData = require('./transform-dlna-data.js').ProcessDNLAData;
-let DLNAClient = require('./dlna.js').Client;
+let ProcessDNLAData = require('../transform-dlna-data.js').ProcessDNLAData;
+let DLNAClient = require('../media-sources/dlna.js').Client;
 
 function CreateErrorResult(body, error) {
   return {

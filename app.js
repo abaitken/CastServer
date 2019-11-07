@@ -7,13 +7,13 @@ const app = express();
 app.use(express.static('static'));
 const server = http.createServer(app);
 
-var notifications = require('./notifications.js');
+var notifications = require('./notifications');
 var notifier = new notifications.Notifier(server);
 
-require("./discover")(app, config);
-require("./browse")(app, config);
-require("./cast")(app, notifier, config);
-require("./playlist")(app, notifier, config);
+require("./routes/discover")(app, config);
+require("./routes/browse")(app, config);
+require("./routes/cast")(app, notifier, config);
+require("./routes/playlist")(app, notifier, config);
 
 server.listen(config.server.listenPort, () => {
   console.log("Server running on port " + config.server.listenPort);

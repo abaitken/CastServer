@@ -1,4 +1,4 @@
-const Chromecast = require('./devices/chromecast.js').Chromecast;
+const Chromecast = require('../devices/chromecast').Chromecast;
 
 module.exports = function (app, notifier, config) {
   // TODO : Resolve this hard coded device!
