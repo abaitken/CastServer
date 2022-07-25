@@ -4,16 +4,41 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>@ViewData["Title"] - CastServer</title>
-    
-    <link rel="stylesheet" href="~/lib/water/out/light.min.css" />
+
+    <link rel="stylesheet" href="~/lib/bootswatch/sandstone/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     @RenderSection("Styles", required: false)
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="NowPlaying"><i class="fas fa-broadcast-tower fa-lg fa-inverse"></i> CastServer</a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"
+                aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarColor01">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item viewCommand clickable" id="browseCommand" data-bind="click: $root.browseCommand">
+                    <a class="nav-link @Html.IsNavigationActive("Home", "Browse", "active")" asp-area="" asp-controller="Home" asp-action="Browse"><i class="fas fa-folder fa-lg"></i> BROWSE</a>
+                </li>
+                <li class="nav-item viewCommand clickable" id="playlistCommand" data-bind="click: $root.playlistCommand">
+                    <a class="nav-link @Html.IsNavigationActive("Home", "Playlist", "active")" asp-area="" asp-controller="Home" asp-action="Playlist"><i class="fas fa-list fa-lg"></i> PLAYLIST</a>
+                </li>
+                <li class="nav-item viewCommand clickable" id="nowPlayingCommand" data-bind="click: $root.nowPlayingCommand">
+                    <a class="nav-link @Html.IsNavigationActive("Home", "NowPlaying", "active")" asp-area="" asp-controller="Home" asp-action="NowPlaying"><i class="fas fa-music fa-lg"></i> NOW PLAYING</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
     <main role="main">
         @RenderBody()
     </main>
-
+    
+    <script type="text/javascript" src="~/lib/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="~/lib/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/lib/knockout/knockout-latest.min.js"></script>
+    <script type="text/javascript" src="~/lib/font-awesome/js/all.min.js"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

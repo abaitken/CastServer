@@ -44,8 +44,22 @@ namespace CastServer
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}");
+                    pattern: "{action}",
+                    defaults: new
+                    {
+                        controller = "Home",
+                        action = "NowPlaying"
+                    });
+                //endpoints.MapControllerRoute(
+                //    name: "api",
+                //    pattern: "api/{action}",
+                //    defaults: new
+                //    {
+                //        controller = "Media",
+                //        action = ""
+                //    });
                 endpoints.MapControllers();
+                
             });
         }
     }

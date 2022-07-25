@@ -12,7 +12,17 @@ namespace CastServer.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public IActionResult NowPlaying()
+        {
+            return View();
+        }
+
+        public IActionResult Playlist()
+        {
+            return View();
+        }
+
+        public IActionResult Browse()
         {
             return View();
         }
