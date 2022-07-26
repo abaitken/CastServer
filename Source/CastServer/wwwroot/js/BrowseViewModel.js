@@ -36,7 +36,7 @@ function ViewModel() {
     self.requestData = function (id, page) {
         $.ajax({
             type: 'GET',
-            url: 'api/Browse?id=' + id + '&page=' + page,
+            url: 'api/Browse/' + id + '/' + page,
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {

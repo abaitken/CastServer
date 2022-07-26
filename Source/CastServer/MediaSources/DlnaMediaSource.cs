@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -14,6 +15,104 @@ namespace CastServer.MediaSources
         {
             _protocol = protocol;
             _domain = domain;
+        }
+
+
+        private dynamic RedefineContainer(dynamic item)
+        {
+            return new
+            {
+                id = item["$"]["id"],
+                parentID = item["$"]["parentID"],
+                childCount = item["$"]["childCount"],
+                title = item["dc:title"],
+                @class = item["upnp:class"],
+                // TODO : Can be an array!
+                albumArtURI = item["upnp:albumArtURI"]["_"]
+            };
+        }
+
+        private dynamic RedefineMusic(dynamic item)
+        {
+            return new
+            {
+                id = item["$"]["id"],
+                parentID = item["$"]["parentID"],
+                title = item["dc:title"],
+                creator = item["dc:creator"],
+                artist = item["upnp:artist"],
+                album = item["upnp:album"],
+                genre = item["upnp:genre"],
+                // TODO : Can be an array! for images
+                res = item["res"]["_"],
+                @class = item["upnp:class"],
+                size = item["res"]["$"]["size"],
+                duration = item["res"]["$"]["duration"],
+                bitrate = item["res"]["$"]["bitrate"],
+                sampleFrequency = item["res"]["$"]["sampleFrequency"],
+                nrAudioChannels = item["res"]["$"]["nrAudioChannels"],
+                protocolInfo = item["res"]["$"]["protocolInfo"],
+                originalTrackNumber = item["upnp:originalTrackNumber"],
+                albumArtURI = item["upnp:albumArtURI"]["_"]
+            };
+        }
+
+        private dynamic RedefineUnknown(dynamic item)
+        {
+            return new
+            {
+                id = item["$"]["id"],
+                parentID = item["$"]["parentID"],
+                title = item["dc:title"],
+                @class = item["upnp:class"],
+            };
+        }
+
+        private dynamic RedefineItem(dynamic item)
+        {
+            var classType = item["upnp:class"];
+            if (classType.toLowerCase().indexOf("folder") != -1)
+            {
+                return RedefineContainer(item);
+            }
+
+            if (classType.toLowerCase().indexOf("track") != -1)
+            {
+                return RedefineMusic(item);
+            }
+
+            return RedefineUnknown(item);
+        }
+
+        private List<dynamic> RestructureEntities(dynamic o)
+        {
+            var result = new List<dynamic>();
+
+            if (o != null)
+            {
+                if (o is IEnumerable a)
+                {
+                    foreach (var item in a)
+                        result.Add(RedefineItem(item));
+                }
+                else
+                {
+                    result.Add(RedefineItem(o));
+                }
+            }
+            return result;
+        }
+
+        private dynamic ProcessDNLAData(dynamic data)
+        {
+            var containers = RestructureEntities(data["container"]);
+            var items = RestructureEntities(data["item"]);
+            var resultItems = containers.concat(items);
+
+            var result = new {
+                items = resultItems
+            };
+            return result;
         }
 
         private bool _request(string requestBody, string soapAction, out string body)
@@ -95,7 +194,8 @@ namespace CastServer.MediaSources
                 yield return match.Groups["DATA"].Value;
         }
 
-        public object Browse(string objectId, int startingIndex, int requestedCount, string sortCriteria) {
+        public IEnumerable<dynamic> Browse(string objectId, int startingIndex, int requestedCount, string sortCriteria)
+        {
             var requestBody = $@"<?xml version=""1.0""?>
                 <s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/"" s:encodingStyle=""http://schemas.xmlsoap.org/soap/encoding/"">
                 <s:Body>
@@ -117,18 +217,19 @@ namespace CastServer.MediaSources
                     var match = getResultRegex.exec(body);
                     var data = g_decode(match["groups"]["DATA"]);
 
-                    let jsonData;
+                    let structuredArrayData;
                     g_parser.parseString(data, function (err, parseResult) {
-                        jsonData = parseResult["DIDL-Lite"];
+                        structuredArrayData = parseResult["DIDL-Lite"];
                     });
 
-                    callback(jsonData, null);
+                    return ProcessDNLAData(structuredArrayData);
             */
 
             return null;
         }
 
-        public object Info(string objectId) {
+        public dynamic Info(string objectId)
+        {
             var requestBody = $@"<?xml version=""1.0""?>
                 <s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/"" s:encodingStyle=""http://schemas.xmlsoap.org/soap/encoding/"">
                 <s:Body>
@@ -149,17 +250,17 @@ namespace CastServer.MediaSources
                     var match = getResultRegex.exec(body);
                     var data = g_decode(match["groups"]["DATA"]);
 
-                    let jsonData;
+                    let structuredArrayData;
                     g_parser.parseString(data, function (err, parseResult) {
-                        jsonData = parseResult["DIDL-Lite"];
+                        structuredArrayData = parseResult["DIDL-Lite"];
                     });
 
-                    callback(jsonData, null);
+                    return ProcessDNLAData(structuredArrayData).items[0];
              */
             return null;
         }
 
-        public object Search(string objectId, int startingIndex, int requestedCount, string sortCriteria, string searchCriteria)
+        public dynamic Search(string objectId, int startingIndex, int requestedCount, string sortCriteria, string searchCriteria)
         {
             //<BrowseFlag>BrowseDirectChildren</BrowseFlag>
             var requestBody = $@"<?xml version=""1.0""?>
@@ -181,12 +282,12 @@ namespace CastServer.MediaSources
                     var match = getResultRegex.exec(body);
                     var data = g_decode(match["groups"]["DATA"]);
 
-                    let jsonData;
+                    let structuredArrayData;
                     g_parser.parseString(data, function (err, parseResult) {
-                        jsonData = parseResult["DIDL-Lite"];
+                        structuredArrayData = parseResult["DIDL-Lite"];
                     });
 
-                    callback(jsonData, null);
+                    return ProcessDNLAData(structuredArrayData, null);
             */
             return null;
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CastServer.MediaSources;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CastServer.Controllers
@@ -7,24 +8,39 @@ namespace CastServer.Controllers
     [Route("api")]
     public class MediaController : ControllerBase
     {
-        [HttpGet]
-        [Route("[action]")]
-        public dynamic Browse([FromQuery] string id, [FromQuery] int page)
+        const int ITEM_PAGE_COUNT = 25;
+        private readonly DlnaMediaSource _mediaSource;
+
+        public MediaController()
         {
+            _mediaSource = new DlnaMediaSource("http", "dnla.services.lan");
+        }
+
+        [HttpGet]
+        [Route("[action]/{id}/{page?}")]
+        public dynamic Browse(string id, int? page)
+        {
+            var result = _mediaSource.Browse(id, (page.HasValue ? page.Value : 0) * ITEM_PAGE_COUNT, ITEM_PAGE_COUNT, "+upnp:class,+dc:title");
             return new
             {
-                items = new object[0]
+                items = result
             };
         }
 
         [HttpGet]
-        [Route("[action]")]
-        public dynamic Info([FromQuery] string id)
+        [Route("[action]/{id}")]
+        public dynamic Info(string id)
         {
-            return new
-            {
-                parentID = -1
-            };
+            var result = _mediaSource.Info(id);
+            return result;
+        }
+
+        [HttpGet]
+        [Route("[action]/{id}/{criteria}/{page?}")]
+        public dynamic Search(string id, string criteria, int? page)
+        {
+            var result = _mediaSource.Search(id, (page.HasValue ? page.Value : 0) * ITEM_PAGE_COUNT, ITEM_PAGE_COUNT, "+upnp:class,+dc:title", $@"dc:title = ""{criteria}""");
+            return result;
         }
 
         [HttpPost]
