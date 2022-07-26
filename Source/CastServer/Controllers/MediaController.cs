@@ -1,6 +1,8 @@
 ﻿using CastServer.MediaSources;
+using CastServer.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace CastServer.Controllers
 {
@@ -25,6 +27,22 @@ namespace CastServer.Controllers
             {
                 items = result
             };
+        }
+
+        [HttpGet]
+        [Route("[action]/{id}")]
+        public dynamic Breadcrumb(string id)
+        {
+            var results = new List<DLNAItem>();
+
+            var item = _mediaSource.Info(id);
+            while(item != null)
+            {
+                results.Insert(0, item);
+                item = _mediaSource.Info(item.parentID);
+            }
+
+            return results;
         }
 
         [HttpGet]

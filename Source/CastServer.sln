@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CastServer", "CastServer\CastServer.csproj", "{53B75EBD-1CCB-4452-A1A0-3444151140C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CastServer.Tests", "CastServer.Tests\CastServer.Tests.csproj", "{9C52BE41-CCA9-4B40-94ED-24019DF4587F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,10 +17,10 @@ Global
 		{53B75EBD-1CCB-4452-A1A0-3444151140C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53B75EBD-1CCB-4452-A1A0-3444151140C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53B75EBD-1CCB-4452-A1A0-3444151140C6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8A31EC9B-8E65-4E97-BFCE-D8B4B33FE931}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8A31EC9B-8E65-4E97-BFCE-D8B4B33FE931}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8A31EC9B-8E65-4E97-BFCE-D8B4B33FE931}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8A31EC9B-8E65-4E97-BFCE-D8B4B33FE931}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C52BE41-CCA9-4B40-94ED-24019DF4587F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C52BE41-CCA9-4B40-94ED-24019DF4587F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C52BE41-CCA9-4B40-94ED-24019DF4587F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C52BE41-CCA9-4B40-94ED-24019DF4587F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

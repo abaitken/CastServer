@@ -1,7 +1,9 @@
-﻿using System;
-using System.Collections;
+﻿using CastServer.Model;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace CastServer.MediaSources
@@ -17,111 +19,30 @@ namespace CastServer.MediaSources
             _domain = domain;
         }
 
-
-        private dynamic RedefineContainer(dynamic item)
+        private IEnumerable<DLNAItem> ParseResultBodyForDLNAStructures(string body)
         {
-            return new
-            {
-                id = item["$"]["id"],
-                parentID = item["$"]["parentID"],
-                childCount = item["$"]["childCount"],
-                title = item["dc:title"],
-                @class = item["upnp:class"],
-                // TODO : Can be an array!
-                albumArtURI = item["upnp:albumArtURI"]["_"]
-            };
+            var regex = new Regex(@"<Result>(?<DATA>.+?)<\/Result>", RegexOptions.Singleline);
+            var match = regex.Match(body);
+            if (!match.Success)
+                return Enumerable.Empty<DLNAItem>();
+
+            var data = match.Groups["DATA"].Value;
+            return DlnaDataParser.FromEncodedString(data);
         }
 
-        private dynamic RedefineMusic(dynamic item)
-        {
-            return new
-            {
-                id = item["$"]["id"],
-                parentID = item["$"]["parentID"],
-                title = item["dc:title"],
-                creator = item["dc:creator"],
-                artist = item["upnp:artist"],
-                album = item["upnp:album"],
-                genre = item["upnp:genre"],
-                // TODO : Can be an array! for images
-                res = item["res"]["_"],
-                @class = item["upnp:class"],
-                size = item["res"]["$"]["size"],
-                duration = item["res"]["$"]["duration"],
-                bitrate = item["res"]["$"]["bitrate"],
-                sampleFrequency = item["res"]["$"]["sampleFrequency"],
-                nrAudioChannels = item["res"]["$"]["nrAudioChannels"],
-                protocolInfo = item["res"]["$"]["protocolInfo"],
-                originalTrackNumber = item["upnp:originalTrackNumber"],
-                albumArtURI = item["upnp:albumArtURI"]["_"]
-            };
-        }
-
-        private dynamic RedefineUnknown(dynamic item)
-        {
-            return new
-            {
-                id = item["$"]["id"],
-                parentID = item["$"]["parentID"],
-                title = item["dc:title"],
-                @class = item["upnp:class"],
-            };
-        }
-
-        private dynamic RedefineItem(dynamic item)
-        {
-            var classType = item["upnp:class"];
-            if (classType.toLowerCase().indexOf("folder") != -1)
-            {
-                return RedefineContainer(item);
-            }
-
-            if (classType.toLowerCase().indexOf("track") != -1)
-            {
-                return RedefineMusic(item);
-            }
-
-            return RedefineUnknown(item);
-        }
-
-        private List<dynamic> RestructureEntities(dynamic o)
-        {
-            var result = new List<dynamic>();
-
-            if (o != null)
-            {
-                if (o is IEnumerable a)
-                {
-                    foreach (var item in a)
-                        result.Add(RedefineItem(item));
-                }
-                else
-                {
-                    result.Add(RedefineItem(o));
-                }
-            }
-            return result;
-        }
-
-        private dynamic ProcessDNLAData(dynamic data)
-        {
-            var containers = RestructureEntities(data["container"]);
-            var items = RestructureEntities(data["item"]);
-            var resultItems = containers.concat(items);
-
-            var result = new {
-                items = resultItems
-            };
-            return result;
-        }
 
         private bool _request(string requestBody, string soapAction, out string body)
         {
             using var client = new HttpClient();
-
+            client.DefaultRequestHeaders.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue
+            {
+                NoCache = true
+            };
             var content = new StringContent(requestBody);
-            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/xml;charset=UTF-8");
-            content.Headers.Add("cache-control", "no-cache");
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/xml")
+            {
+                CharSet = Encoding.UTF8.WebName
+            };
             content.Headers.Add("SOAPACTION", soapAction);
             client.Timeout = TimeSpan.FromSeconds(5);
             var requestTask = client.PostAsync($"{_protocol}://{_domain}/ctl/ContentDir", content);
@@ -129,7 +50,9 @@ namespace CastServer.MediaSources
 
             var response = requestTask.Result;
 
-            body = response.Content.ToString();
+            var readTask = response.Content.ReadAsStringAsync();
+            readTask.Wait();
+            body = readTask.Result;
             return true;
         }
 
@@ -194,7 +117,7 @@ namespace CastServer.MediaSources
                 yield return match.Groups["DATA"].Value;
         }
 
-        public IEnumerable<dynamic> Browse(string objectId, int startingIndex, int requestedCount, string sortCriteria)
+        public IEnumerable<DLNAItem> Browse(string objectId, int startingIndex, int requestedCount, string sortCriteria)
         {
             var requestBody = $@"<?xml version=""1.0""?>
                 <s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/"" s:encodingStyle=""http://schemas.xmlsoap.org/soap/encoding/"">
@@ -211,24 +134,12 @@ namespace CastServer.MediaSources
                 </s:Envelope>";
 
             this._request(requestBody, "urn:schemas-upnp-org:service:ContentDirectory:1#Browse", out var body);
-            /*
-             
-                    const getResultRegex = /<Result>(?<DATA>[^]+)<\/Result>/;
-                    var match = getResultRegex.exec(body);
-                    var data = g_decode(match["groups"]["DATA"]);
 
-                    let structuredArrayData;
-                    g_parser.parseString(data, function (err, parseResult) {
-                        structuredArrayData = parseResult["DIDL-Lite"];
-                    });
-
-                    return ProcessDNLAData(structuredArrayData);
-            */
-
-            return null;
+            var result = ParseResultBodyForDLNAStructures(body);
+            return result;
         }
 
-        public dynamic Info(string objectId)
+        public DLNAItem Info(string objectId)
         {
             var requestBody = $@"<?xml version=""1.0""?>
                 <s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/"" s:encodingStyle=""http://schemas.xmlsoap.org/soap/encoding/"">
@@ -238,29 +149,19 @@ namespace CastServer.MediaSources
                 <BrowseFlag>BrowseMetadata</BrowseFlag>
                 <Filter>*</Filter>
                 <StartingIndex>0</StartingIndex>
-                <RequestedCount>0</RequestedCount>
+                <RequestedCount>1</RequestedCount>
                 <SortCriteria></SortCriteria>
                 </u:Browse>
                 </s:Body>
                 </s:Envelope>";
 
             this._request(requestBody, "urn:schemas-upnp-org:service:ContentDirectory:1#Browse", out var body);
-            /*
-                    const getResultRegex = /<Result>(?<DATA>[^]+)<\/Result>/;
-                    var match = getResultRegex.exec(body);
-                    var data = g_decode(match["groups"]["DATA"]);
 
-                    let structuredArrayData;
-                    g_parser.parseString(data, function (err, parseResult) {
-                        structuredArrayData = parseResult["DIDL-Lite"];
-                    });
-
-                    return ProcessDNLAData(structuredArrayData).items[0];
-             */
-            return null;
+            var result = ParseResultBodyForDLNAStructures(body);
+            return result.FirstOrDefault();
         }
 
-        public dynamic Search(string objectId, int startingIndex, int requestedCount, string sortCriteria, string searchCriteria)
+        public IEnumerable<DLNAItem> Search(string objectId, int startingIndex, int requestedCount, string sortCriteria, string searchCriteria)
         {
             //<BrowseFlag>BrowseDirectChildren</BrowseFlag>
             var requestBody = $@"<?xml version=""1.0""?>
@@ -277,19 +178,8 @@ namespace CastServer.MediaSources
 
             this._request(requestBody, "urn:schemas-upnp-org:service:ContentDirectory:1#Search", out var body);
 
-            /*
-                    const getResultRegex = /<Result>(?<DATA>[^]+)<\/Result>/;
-                    var match = getResultRegex.exec(body);
-                    var data = g_decode(match["groups"]["DATA"]);
-
-                    let structuredArrayData;
-                    g_parser.parseString(data, function (err, parseResult) {
-                        structuredArrayData = parseResult["DIDL-Lite"];
-                    });
-
-                    return ProcessDNLAData(structuredArrayData, null);
-            */
-            return null;
+            var result = ParseResultBodyForDLNAStructures(body);
+            return result;
         }
     }
 }

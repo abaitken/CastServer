@@ -20,22 +20,22 @@
         <div class="list-group-item d-flex justify-content-between clickable folderItemCell"
              data-bind="click: $parent.itemClicked, clickBubble: false">
             <span class="folderItemIcon">
-                <!-- ko if: $parent._determineItemType($data['class']) == $parent.ITEM_TYPES.CONTAINER -->
+                <!-- ko if: $parent._determineItemType($data['type']) == $parent.ITEM_TYPES.CONTAINER -->
                 <i class="fas fa-folder fa-lg"></i>
                 <!-- /ko -->
-                <!-- ko if: $parent._determineItemType($data['class']) == $parent.ITEM_TYPES.MUSIC -->
+                <!-- ko if: $parent._determineItemType($data['type']) == $parent.ITEM_TYPES.MUSIC -->
                 <i class="fas fa-music fa-lg"></i>
                 <!-- /ko -->
-                <!-- ko if: $parent._determineItemType($data['class']) == $parent.ITEM_TYPES.PHOTO -->
+                <!-- ko if: $parent._determineItemType($data['type']) == $parent.ITEM_TYPES.PHOTO -->
                 <i class="fas fa-image fa-lg"></i>
                 <!-- /ko -->
-                <!-- ko if: $parent._determineItemType($data['class']) == $parent.ITEM_TYPES.UNKNOWN -->
+                <!-- ko if: $parent._determineItemType($data['type']) == $parent.ITEM_TYPES.UNKNOWN -->
                 <i class="fas fa-question-circle fa-lg"></i>
                 <!-- /ko -->
             </span>
             <span class="folderItemTitle" data-bind="text: title"></span>
             <span class="ml-auto">
-                <!-- ko if: $parent.canPlay($data) -->
+                <!-- ko if: $data['canplay'] -->
                 <button type="button" class="btn btn-default"
                         data-bind="click: $parent.addEntityToPlaylist, clickBubble: false">
                     <i class="fas fa-stream"></i>
