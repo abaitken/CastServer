@@ -10,14 +10,13 @@
     };
 
     self.removeEntityFromPlaylist = function (item) {
-
         $.ajax({
             type: 'POST',
-            url: 'api/Playlist?id=' + item['id'] + '&op=' + 'remove',
+            url: 'api/Playlist/' + item['id'] + '/' + 'Remove',
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
-                // NOTE : Message will come back to indicate that a playlist item was added
+                self.updatePlaylist(); // TODO : Make smarter with a huge new request for the full list
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 //root.errors.error(errorThrown);
@@ -35,11 +34,11 @@
 
         $.ajax({
             type: 'POST',
-            url: 'api/Playlist?id=' + '-1' + '&op=' + 'clear',
+            url: 'api/Playlist/Clear',
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
-                // NOTE : Message will come back to indicate that a playlist item was added
+                self.updatePlaylist(); // TODO : Make smarter with a huge new request for the full list
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 //root.errors.error(errorThrown);
@@ -54,7 +53,7 @@
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
-                self.playlist(data);
+                self.playlist(data); // TODO : Implement paging with smart scrolling
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 //root.errors.error(errorThrown);
@@ -78,11 +77,11 @@
     self.notifyPlaylistPosition = function (id, index) {
         $.ajax({
             type: 'POST',
-            url: 'api/PlaylistMove?id=' + id + '&to=' + index,
+            url: 'api/Playlist/' + id + '/Move/' + index,
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
-                // NOTE : Message will come back to indicate that a playlist item was added
+                self.updatePlaylist(); // TODO : Make smarter with a huge new request for the full list
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 //root.errors.error(errorThrown);
@@ -107,7 +106,8 @@
             e.target.classList.add('insertBelow');
         }
 
-        e.dataTransfer.dropEffect = 'move';
+        let event = e.originalEvent;
+        event.dataTransfer.dropEffect = 'move';
 
         return true;
     };
@@ -144,9 +144,10 @@
 
     self.dragStart = function (item, e) {
         self.dragItem = item;
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/html', e.target.outerHTML);
-        e.target.classList.add('dragging');
+        let event = e.originalEvent;
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/html', e.target.outerHTML);
+        event.target.classList.add('dragging');
         return true;
     };
 
@@ -157,45 +158,45 @@
         return true;
     };
 
-    self.onRoutedEvent = function (eventName, args) {
+    //self.onRoutedEvent = function (eventName, args) {
 
-        if (eventName !== 'socketmessage')
-            return;
+    //    if (eventName !== 'socketmessage')
+    //        return;
 
-        var data = args;
+    //    var data = args;
 
-        if (data['category'] !== 'playlist')
-            return;
+    //    if (data['category'] !== 'playlist')
+    //        return;
 
-        if (!data['action']) {
-            console.log("No action for playlist category");
-            return;
-        }
+    //    if (!data['action']) {
+    //        console.log("No action for playlist category");
+    //        return;
+    //    }
 
-        switch (data['action']) {
-            case 'add':
-                root._serviceRequest('info', data['id'])
-                    .done(function (data) {
-                        self.playlist.push(data);
-                    })
-                    .fail(function (jqXHR, textStatus, errorThrown) {
-                        root.errors.error(errorThrown);
-                    });
-                break;
-            case 'remove':
-                self._removePlaylistItemImpl(data['id']);
-                break;
-            case 'clear':
-                self.playlist([]);
-                break;
-            case 'move':
-                self.moveImpl(data['id'], data['index']);
-                break;
-            default:
-                console.log("Unexpected action: " + data['action']);
-                break;
-        }
-    };
+    //    switch (data['action']) {
+    //        case 'add':
+    //            root._serviceRequest('info', data['id'])
+    //                .done(function (data) {
+    //                    self.playlist.push(data);
+    //                })
+    //                .fail(function (jqXHR, textStatus, errorThrown) {
+    //                    root.errors.error(errorThrown);
+    //                });
+    //            break;
+    //        case 'remove':
+    //            self._removePlaylistItemImpl(data['id']);
+    //            break;
+    //        case 'clear':
+    //            self.playlist([]);
+    //            break;
+    //        case 'move':
+    //            self.moveImpl(data['id'], data['index']);
+    //            break;
+    //        default:
+    //            console.log("Unexpected action: " + data['action']);
+    //            break;
+    //    }
+    //};
     self.updatePlaylist();
 }
 

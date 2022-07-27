@@ -12,10 +12,12 @@ namespace CastServer.Controllers
     {
         const int ITEM_PAGE_COUNT = 25;
         private readonly DlnaMediaSource _mediaSource;
+        private readonly Playlist _playlist;
 
-        public MediaController()
+        public MediaController(Playlist playlist)
         {
             _mediaSource = new DlnaMediaSource("http", "dnla.services.lan");
+            _playlist = playlist;
         }
 
         [HttpGet]
@@ -61,25 +63,43 @@ namespace CastServer.Controllers
             return result;
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("[action]")]
         public dynamic Playlist()
         {
-            return System.Array.Empty<object>();
+            return _playlist.Items;
         }
 
         [HttpPost]
-        [Route("[action]")]
-        public dynamic Playlist([FromQuery] string id, [FromQuery] string op)
+        [Route("Playlist/{id}/Add")]
+        public dynamic PlaylistAdd(string id)
         {
-            return false;
+            _playlist.Add(_mediaSource.Info(id));
+            return true;
         }
 
         [HttpPost]
-        [Route("[action]")]
-        public dynamic PlaylistMove([FromQuery] string id, [FromQuery] string to)
+        [Route("Playlist/{id}/Remove")]
+        public dynamic PlaylistRemove(string id)
         {
-            return false;
+            _playlist.Remove(id);
+            return true;
+        }
+
+        [HttpPost]
+        [Route("Playlist/Clear")]
+        public dynamic PlaylistClear()
+        {
+            _playlist.Clear();
+            return true;
+        }
+
+        [HttpPost]
+        [Route("Playlist/{id}/Move/{to}")]
+        public dynamic PlaylistMove(string id, int to)
+        {
+            _playlist.Move(id, to);
+            return true;
         }
 
         [HttpPut]

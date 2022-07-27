@@ -14,18 +14,18 @@ function ViewModel() {
     self.focusItem = ko.observable(false);
 
     self.addEntityToPlaylist = function (item) {
-        //$.ajax({
-        //    type: 'POST',
-        //    url: 'api/Playlist?id=' + item['id'] + '&op=' + 'add',
-        //    dataType: 'json',
-        //    mimeType: 'application/json',
-        //    success: function (data) {
-        //        // NOTE : Message will come back to indicate that a playlist item was added
-        //    },
-        //    error: function (jqXHR, textStatus, errorThrown) {
-        //        //root.errors.error(errorThrown);
-        //    }
-        //});
+        $.ajax({
+            type: 'POST',
+            url: 'api/Playlist/' + item['id'] + '/' + 'Add',
+            dataType: 'json',
+            mimeType: 'application/json',
+            success: function (data) {
+                // NOTE : Message will come back to indicate that a playlist item was added
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                //root.errors.error(errorThrown);
+            }
+        });
     };
 
     self.breadcrumbJump = function (item) {
