@@ -26,7 +26,7 @@ function ViewModel(root) {
     self.backward = function () {
         $.ajax({
             type: 'PUT',
-            url: 'api/Cast?op=' + 'previous',
+            url: 'api/Cast/' + 'Previous',
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
@@ -41,7 +41,7 @@ function ViewModel(root) {
     self.rewind = function () {
         $.ajax({
             type: 'PUT',
-            url: 'api/Cast?op=' + 'rewind',
+            url: 'api/Cast/' + 'Rewind',
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
@@ -56,7 +56,7 @@ function ViewModel(root) {
     self.play = function () {
         $.ajax({
             type: 'PUT',
-            url: 'api/Cast?op=' + 'play',
+            url: 'api/Cast/' + 'Play',
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
@@ -71,7 +71,7 @@ function ViewModel(root) {
     self.pause = function () {
         $.ajax({
             type: 'PUT',
-            url: 'api/Cast?op=' + 'pause',
+            url: 'api/Cast/' + 'Pause',
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
@@ -86,7 +86,7 @@ function ViewModel(root) {
     self.forward = function () {
         $.ajax({
             type: 'PUT',
-            url: 'api/Cast?op=' + 'next',
+            url: 'api/Cast/' + 'Next',
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
@@ -101,7 +101,7 @@ function ViewModel(root) {
     self.seekahead = function () {
         $.ajax({
             type: 'PUT',
-            url: 'api/Cast?op=' + 'seekahead',
+            url: 'api/Cast/' + 'SeekAhead',
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
@@ -116,7 +116,7 @@ function ViewModel(root) {
     self.shuffle = function () {
         $.ajax({
             type: 'PUT',
-            url: 'api/Cast?op=' + 'shuffle',
+            url: 'api/Cast/' + 'Shuffle',
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
@@ -131,7 +131,7 @@ function ViewModel(root) {
     self.repeat = function () {
         $.ajax({
             type: 'PUT',
-            url: 'api/Cast?op=' + 'repeat',
+            url: 'api/Cast/' + 'Repeat',
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
@@ -146,7 +146,7 @@ function ViewModel(root) {
     self.mute = function () {
         $.ajax({
             type: 'PUT',
-            url: 'api/Cast?op=' + 'mute',
+            url: 'api/Cast/' + 'Mute',
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
@@ -161,7 +161,7 @@ function ViewModel(root) {
     self.unmute = function () {
         $.ajax({
             type: 'PUT',
-            url: 'api/Cast?op=' + 'unmute',
+            url: 'api/Cast/' + 'Unmute',
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
@@ -176,7 +176,7 @@ function ViewModel(root) {
     self.stop = function () {
         $.ajax({
             type: 'PUT',
-            url: 'api/Cast?op=' + 'stop',
+            url: 'api/Cast/' + 'Stop',
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
@@ -191,7 +191,7 @@ function ViewModel(root) {
     self.updateVolume = function (newValue) {
         $.ajax({
             type: 'PUT',
-            url: 'api/CastVolume?value=' + newValue,
+            url: 'api/Cast/Volume/' + newValue,
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {
@@ -209,7 +209,7 @@ function ViewModel(root) {
     self.getStatus = function () {
         $.ajax({
             type: 'GET',
-            url: 'api/CastStatus',
+            url: 'api/Cast/Status',
             dataType: 'json',
             mimeType: 'application/json',
             success: function (data) {

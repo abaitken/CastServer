@@ -1,8 +1,8 @@
 ﻿using CastServer.Model;
+using Sharpcaster;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Zeroconf;
 
 namespace CastServer.CastingTargets
 {
@@ -10,7 +10,9 @@ namespace CastServer.CastingTargets
     {
         public async Task<IEnumerable<CastingTarget>> Discover()
         {
-            var responses = await ZeroconfResolver.ResolveAsync("_googlecast._tcp.local.");
+
+            var locator = new MdnsChromecastLocator();
+            var responses = await locator.FindReceiversAsync();
 
             var results = from item in responses
                           select new CastingTarget(item);

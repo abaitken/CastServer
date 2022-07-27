@@ -13,7 +13,7 @@
 
 
 	<ItemGroup>
-	  <PackageReference Include="Zeroconf" Version="3.6.11" />
+	  <PackageReference Include="Sharpcaster" Version="1.0.5" />
 	</ItemGroup>
 	
 </Project>

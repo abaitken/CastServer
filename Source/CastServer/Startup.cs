@@ -19,6 +19,7 @@ namespace CastServer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<Playlist>();
+            services.AddSingleton<CastingConnection>();
             services.AddHostedService<CastingService>();
             services.AddControllersWithViews();
         }

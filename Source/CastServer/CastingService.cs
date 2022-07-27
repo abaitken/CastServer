@@ -10,12 +10,14 @@ namespace CastServer
     {
         private readonly TimeSpan _queueDelay;
         private readonly ILogger<CastingService> _logger;
+        private readonly CastingConnection _castingConnection;
         private CancellationTokenSource _delayCancellation;
 
-        public CastingService(ILogger<CastingService> logger)
+        public CastingService(ILogger<CastingService> logger, CastingConnection castingConnection)
         {
             _queueDelay = TimeSpan.FromMinutes(5);
             _logger = logger;
+            _castingConnection = castingConnection;
             //_playlist.ProjectAdded += _playlist_ItemsAdded;
         }
 

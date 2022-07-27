@@ -14,11 +14,13 @@ namespace CastServer.Controllers
         const int ITEM_PAGE_COUNT = 25;
         private readonly DlnaMediaSource _mediaSource;
         private readonly Playlist _playlist;
+        private readonly CastingConnection _castingConnection;
 
-        public MediaController(Playlist playlist)
+        public MediaController(Playlist playlist, CastingConnection castingConnection)
         {
             _mediaSource = new DlnaMediaSource("http", "dnla.services.lan");
             _playlist = playlist;
+            _castingConnection = castingConnection;
         }
 
         [HttpGet]
@@ -112,32 +114,117 @@ namespace CastServer.Controllers
             return true;
         }
 
-        [HttpPut]
-        [Route("[action]")]
-        public dynamic Cast([FromQuery] string op)
+        [HttpGet]
+        [Route("Cast/Status")]
+        public async Task<dynamic> CastStatus()
         {
-            return false;
-        }
-
-        [HttpPut]
-        [Route("[action]")]
-        public dynamic CastVolume([FromQuery] string value)
-        {
-            return false;
+            var status = await _castingConnection.GetStatus();
+            return status;
         }
 
         [HttpGet]
-        [Route("[action]")]
-        public dynamic CastStatus()
+        [Route("Cast/MediaStatus")]
+        public async Task<dynamic> CastMediaStatus()
         {
-            return new
-            {
-                volume = new
-                {
-                    level = 0.5,
-                    muted = 0
-                }
-            };
+            var status = await _castingConnection.GetMediaStatus();
+            return status;
         }
+
+        [HttpPut]
+        [Route("Cast/Pause")]
+        public dynamic CastPause()
+        {
+            _castingConnection.Pause();
+            return true;
+        }
+
+        [HttpPut]
+        [Route("Cast/Play")]
+        public dynamic CastPlay()
+        {
+            _castingConnection.Play();
+            return true;
+        }
+
+        [HttpPut]
+        [Route("Cast/Stop")]
+        public dynamic CastStop()
+        {
+            _castingConnection.Stop();
+            return true;
+        }
+
+        [HttpPut]
+        [Route("Cast/Next")]
+        public dynamic CastNext()
+        {
+            _castingConnection.Next();
+            return true;
+        }
+
+        [HttpPut]
+        [Route("Cast/Previous")]
+        public dynamic CastPrevious()
+        {
+            _castingConnection.Previous();
+            return true;
+        }
+
+        [HttpPut]
+        [Route("Cast/Rewind")]
+        public dynamic CastRewind()
+        {
+            _castingConnection.Rewind();
+            return true;
+        }
+
+        [HttpPut]
+        [Route("Cast/SeekAhead")]
+        public dynamic CastSeekAhead()
+        {
+            _castingConnection.SeekAhead();
+            return true;
+        }
+
+        [HttpPut]
+        [Route("Cast/Mute")]
+        public dynamic CastMute()
+        {
+            _castingConnection.Mute();
+            return true;
+        }
+
+        [HttpPut]
+        [Route("Cast/Unmute")]
+        public dynamic CastUnmute()
+        {
+            _castingConnection.Unmute();
+            return true;
+        }
+
+        [HttpPut]
+        [Route("Cast/Repeat")]
+        public dynamic CastRepeat()
+        {
+            _castingConnection.Repeat();
+            return true;
+        }
+
+        [HttpPut]
+        [Route("Cast/Shuffle")]
+        public dynamic CastShuffle()
+        {
+            _castingConnection.Shuffle();
+            return true;
+        }
+
+        [HttpPut]
+        [Route("Cast/Volume/{value}")]
+        public dynamic CastVolume(double value)
+        {
+            _castingConnection.SetVolume(value);
+            return true;
+        }
+
     }
 }

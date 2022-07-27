@@ -1,16 +1,16 @@
-﻿using Zeroconf;
+﻿using Sharpcaster.Models;
 
 namespace CastServer.Model
 {
     public class CastingTarget
     {
-        private IZeroconfHost _item;
+        private ChromecastReceiver _item;
 
-        public CastingTarget(IZeroconfHost item)
+        public CastingTarget(ChromecastReceiver item)
         {
             _item = item;
         }
 
-        public string DisplayName { get => _item.DisplayName; }
+        public string DisplayName { get => _item.Name; }
     }
 }
