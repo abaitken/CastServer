@@ -1,6 +1,6 @@
 # CastServer
 
-A Node.js server and single page application for browsing and casting media.
+A server for browsing and casting media. (Work in progress)
 
 ## Origin
 
@@ -8,7 +8,7 @@ This project comes from an unsatisfactory experience with several "media browsin
 
 Most solutions are very similar, an app runs on the phone, connects to the reciever. Or run a media center which is effectively the reciever. This is not what I want.
 
-I am a software developer and I can do something about this. Also I found that I can achieve this with Node.js and get to work with web technologies that I have not previously practiced.
+I am a software developer and I can do something about this.
 
 ## Objective
 
