@@ -1,8 +1,9 @@
-﻿using CastServer.MediaSources;
+﻿using CastServer.CastingTargets;
+using CastServer.MediaSources;
 using CastServer.Model;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CastServer.Controllers
 {
@@ -18,6 +19,15 @@ namespace CastServer.Controllers
         {
             _mediaSource = new DlnaMediaSource("http", "dnla.services.lan");
             _playlist = playlist;
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<dynamic> Discover()
+        {
+            var discoverer = new CastingTargetDiscoverer();
+            var result = await discoverer.Discover();
+            return result;
         }
 
         [HttpGet]
